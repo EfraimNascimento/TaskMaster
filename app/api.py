@@ -5,118 +5,67 @@ from .models import db, User, Task
 
 api_bp = Blueprint('api', __name__)
 
-# EndPoint de login para API (Gera o Token)
+# ROTA 1: Login para gerar o Token JWT
 @api_bp.route('/login', methods=['POST'])
-def api_login():
-    # APIs recebem dados em JSN, não em formulários
-    data = request.get_json()
+def login():
+    dados = request.get_json()
+    if not dados or 'username' not in dados or 'password' not in dados:
+        return jsonify({"erro": "Envie username e password"}), 400
+        
+    user = User.query.filter_by(username=dados['username']).first()
+    if user and check_password_hash(user.password_hash, dados['password']):
+        # Cria o token usando o ID do usuário como identidade
+        token = create_access_token(identity=str(user.id))
+        return jsonify({"access_token": token}), 200
+        
+    return jsonify({"erro": "Credenciais inválidas"}), 401
 
-    if not data or not data.get('username') or not data.get('password'):
-        return jsonify({'message': 'Dados de login ausentes'}), 400
-
-    user = User.query.filter_by(username=data.get('username')).first()
-
-    if user and check_password_hash(user.password_hash, data.get('password')):
-        # Se a senha estiver correta, criamos o token
-        # Usamos o ID do usuário como "Identidade" do token
-        access_token = create_access_token(identity=str(user.id))
-        return jsonify(access_token=access_token), 200
-
-    return jsonify({'message': 'Credenciais inválidas'}), 401
-
-# EndPoint para listar as tarefas do usuário logado (Requer Token)
-@api_bp.route('/tasks', methods=['GET'])
+# ROTA 2: Listar (GET) e Criar (POST) tarefas
+@api_bp.route('/tasks', methods=['GET', 'POST'])
 @jwt_required()
-def get_tasks():
-    # get_jwt_identity() retorna a 'identity' (o ID do usuário) que guardamos no token
+def handle_tasks():
     current_user_id = get_jwt_identity()
+    
+    if request.method == 'POST':
+        dados = request.get_json()
+        if not dados or 'title' not in dados:
+            return jsonify({"erro": "O campo title é obrigatório"}), 400
+            
+        nova_tarefa = Task(
+            title=dados['title'],
+            description=dados.get('description', ''),
+            user_id=current_user_id
+        )
+        db.session.add(nova_tarefa)
+        db.session.commit()
+        return jsonify({"mensagem": "Tarefa criada!", "id": nova_tarefa.id}), 201
+        
+    # Se for GET:
     tasks = Task.query.filter_by(user_id=current_user_id).all()
+    lista = [{"id": t.id, "title": t.title, "description": t.description, "status": t.status} for t in tasks]
+    return jsonify(lista), 200
 
-    # Convertemos os objetos Task em uma lista de dicionários (serialização)
-    task_list = []
-    for task in task:
-        task_list.append({
-            'id': task.id,
-            'title': task.title,
-            'description': task.description,
-            'status': task.status
-        })
-    return jsonify({'tasks': task_list}), 200
-
-# Método POST
-@api_bp.route('/tasks', methods=['POST'])
+# ROTA 3: Editar (PUT) e Excluir (DELETE) tarefa específica
+@api_bp.route('/tasks/<int:task_id>', methods=['PUT', 'DELETE'])
 @jwt_required()
-def create_task():
-    current_user_id = get_jwt_identity()
-    data = request.get_json()
-
-    if not data or not data.get('title'):
-        return jsonify({'message': 'O título da tarefa é obrigatório'}), 400
-
-    new_task = Task(
-        title=data.get('title'),
-        description=data.get('description'),
-        user_id=current_user_id
-    )
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return jsonify({'message': 'Tarefa criada com sucesso', 'task_id': new_task.id}), 201
-
-
-# Método GET
-@api_bp.route('/tasks/<int:task_id>', methods=['GET'])
-@jwt_required()
-def get_task(task_id):
+def handle_task_id(task_id):
     current_user_id = get_jwt_identity()
     task = Task.query.filter_by(id=task_id, user_id=current_user_id).first()
-
+    
     if not task:
-        return jsonify({'message': 'Tarefa não encontrada'}), 404
-
-    return jsonify({
-        'id': task_id,
-        'title': task.title,
-        'description': task.description,
-        'status': task.status
-    }), 200
-
-
-#Método PUT
-@api_bp.route('/tasks/<int:task_id>', methods=['PUT'])
-@jwt_required()
-def update_task(task_id):
-    current_user_id = get_jwt_identity()
-    task = Task.query.filter_by(id=task_id, user_id=current_user_id).first()
-
-    if not task:
-        return jsonify({'message': 'Tarefa não encontrada'}), 404
-
-    data = request.get_json()
-    if not task:
-        return jsonify({'message': 'Nenhum dado fornecido'}), 400
-
-    if 'title' in data:
-        task.title = data['title']
-    if 'description' in data:
-        task.description = data['description']
-    if 'status' in data:
-        task.status = data['status']
-
-    db.session.commit()
-    return jsonify({'message': 'Tarefa atualizada com sucesso'}), 200
-
-#Método DELETE
-@api_bp.route('/tasks/<int:task_id>', methods=['DELETE'])
-@jwt_required()
-def delete_task(task_id):
-    current_user_id = get_jwt_identity()
-    task = Task.query.filter_by(id=task_id, user_id=current_user_id).first()
-
-    if not task:
-        return jsonify({'message': 'Tarefa não encontrada'}), 404
-
-    db.session.delete(task)
-    db.session.commit()
-    return jsonify({'message': 'Tarefa deletada com sucesso'}), 200
+        return jsonify({"erro": "Tarefa não encontrada"}), 404
+        
+    if request.method == 'PUT':
+        dados = request.get_json()
+        task.title = dados.get('title', task.title)
+        task.description = dados.get('description', task.description)
+        if 'status' in dados:
+            task.status = dados['status']
+            
+        db.session.commit()
+        return jsonify({"mensagem": "Tarefa atualizada!"}), 200
+        
+    elif request.method == 'DELETE':
+        db.session.delete(task)
+        db.session.commit()
+        return jsonify({"mensagem": "Tarefa excluída!"}), 200

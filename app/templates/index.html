@@ -28,8 +28,11 @@
                     {% if task.status %} Desfazer {% else %} Concluir {% endif %}
                 </a>
                 
-                <!-- Botão que chama o modal -->
-                <button type="button" class="btn btn-text" onclick="openDeleteModal('{{ url_for('tasks.delete_task', task_id=task.id) }}')">
+                <!-- Guardamos a URL gerada em uma variável Jinja pura -->
+                {% set url_delete = url_for('tasks.delete_task', task_id=task.id) %}
+                
+                <!-- Usamos a variável diretamente, evitando conflitos de aspas -->
+                <button type="button" class="btn btn-text" onclick="openDeleteModal('{{ url_delete }}')">
                     Excluir
                 </button>
             </div>
