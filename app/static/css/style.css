@@ -1,0 +1,266 @@
+:root {
+    --bg-color: #fafafa;
+    --surface: #ffffff;
+    --border: #eaeaea;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --primary: #1a1a1a;
+    --primary-hover: #333333;
+    --danger: #dc2626;
+    --danger-hover: #fee2e2;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --radius: 8px;
+}
+
+* { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-color); 
+    color: var(--text-main);           
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.5px; }
+.user-actions { display: flex; gap: var(--spacing-md); align-items: center; font-size: 0.9rem; }
+.user-greeting { color: var(--text-muted); display: none; /* Esconde em telas muito pequenas */ }
+
+.nav-link { color: var(--text-main); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-link:hover { color: var(--text-muted); }
+
+/* Container Principal */
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: var(--spacing-lg) auto;
+    padding: 0 var(--spacing-md);
+    flex: 1;
+}
+
+.header-section { margin-bottom: var(--spacing-lg); }
+.page-title { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 600; letter-spacing: -1px; }
+
+/* Formulário - Flexível para adaptar ao tamanho */
+.task-form {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: 3rem;
+    align-items: stretch;
+}
+
+.input-field {
+    flex: 1; /* Faz os inputs dividirem o espaço igualmente na tela grande */
+    min-width: 0; /* Impede que o input estoure o container no Flexbox */
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    background-color: var(--surface);
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(--primary); }
+
+/* Lista de Tarefas */
+.task-list { list-style: none; display: flex; flex-direction: column; gap: var(--spacing-sm); }
+
+.task-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Alinha o texto e botões pelo topo */
+    gap: var(--spacing-md);
+    transition: box-shadow 0.2s;
+}
+.task-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+.task-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.task-title { font-weight: 500; font-size: 1rem; word-break: break-word; line-height: 1.3; }
+.task-desc { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; word-break: break-word; }
+
+.completed { background-color: var(--bg-color); }
+.completed .task-title { text-decoration: line-through; color: var(--text-muted); }
+.empty-state { text-align: center; color: var(--text-muted); padding: 3rem 1rem; border: 1px dashed var(--border); border-radius: var(--radius); }
+
+/* Botões */
+.task-actions { display: flex; gap: var(--spacing-sm); flex-shrink: 0; }
+.btn {
+    padding: 0.6rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
+    cursor: pointer; text-decoration: none; transition: all 0.2s;
+    display: inline-flex; align-items: center; justify-content: center;
+    white-space: nowrap; /* Evita que o texto do botão quebre em duas linhas */
+}
+
+.btn-primary { background: var(--primary); color: #fff; border: 1px solid var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: #ccc; background-color: var(--bg-color); }
+.btn-text { background: transparent; color: var(--danger); border: 1px solid transparent; }
+.btn-text:hover { background: var(--danger-hover); }
+
+.auth-container {
+    max-width: 400px;
+    margin: 4rem auto;
+    background: var(--surface);
+    padding: 2.5rem 2rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.auth-form { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.auth-title { text-align: center; margin-top: 0; margin-bottom: 2rem; font-size: 1.5rem; font-weight: 600; }
+
+.auth-links { margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
+.auth-links a { color: var(--primary); text-decoration: none; font-weight: 500; }
+.auth-links a:hover { text-decoration: underline; }
+
+/* =========================================
+   MODAL DE EXCLUSÃO (Popup Customizado)
+   ========================================= */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none; /* Escondido por padrão */
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.modal-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+.modal-actions .btn { min-width: 100px; }
+
+/* Botão de tema destacado na navbar */
+/* =========================================
+   ANIMAÇÃO GLOBAL DE TEMA (O efeito pintura)
+   ========================================= */
+body, .navbar, .task-item, .auth-container, .modal-content, .input-field, .btn, .theme-switch {
+    transition: background-color 0.8s ease-in-out, 
+                color 0.8s ease-in-out, 
+                border-color 0.8s ease-in-out, 
+                box-shadow 0.8s ease-in-out;
+}
+
+/* =========================================
+   BOTÃO DESLIZANTE (Switch)
+   ========================================= */
+.theme-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 64px;
+    height: 32px;
+    background-color: #e5e7eb;
+    border-radius: 30px;
+    text-decoration: none;
+    padding: 0 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+
+.switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), background-color 0.6s;
+    z-index: 2;
+}
+
+.icon-sun, .icon-moon { font-size: 14px; z-index: 1; user-select: none; }
+
+/* =========================================
+   CORES DO MODO ESCURO E ESTADOS DO SWITCH
+   ========================================= */
+body.dark-theme {
+    --bg-color: #0f1115;
+    --surface: #181a1f;
+    --border: #2d3038;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --primary: #ffffff;
+    --primary-hover: #e2e8f0;
+}
+
+/* Mantém o texto do botão primário preto no fundo branco */
+body.dark-theme .btn-primary { color: #000000; }
+
+/* Quando o tema for escuro, a bolinha desliza para a direita e o fundo escurece */
+body.dark-theme .theme-switch {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+body.dark-theme .switch-thumb {
+    transform: translateX(32px); /* Desliza a bolinha */
+    background-color: #111111;
+}
+
+/* ========================================================
+   MEDIA QUERIES - MÁGICA DA RESPONSIVIDADE
+   ======================================================== */
+@media (min-width: 480px) {
+    /* Em telas um pouco maiores que celular, mostra o nome do usuário */
+    .user-greeting { display: inline; }
+}
+
+@media (max-width: 600px) {
+    /* CELULARES: Empilha o formulário verticalmente */
+    .task-form { flex-direction: column; gap: 8px; }
+    .btn-primary { width: 100%; } /* Botão Adicionar ocupa a largura total */
+    
+    /* CELULARES: Empilha a tarefa e os botões de ação */
+    .task-item { flex-direction: column; align-items: stretch; gap: var(--spacing-md); }
+    .task-actions { 
+        width: 100%; 
+        display: grid; /* Grid permite que os dois botões dividam a tela 50/50 */
+        grid-template-columns: 1fr 1fr; 
+    }
+    .btn { width: 100%; } /* Garante que preencham a grid */
+}
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - {% block title %}{% endblock %}</title>
+    <!-- Fonte Clean: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">TaskMaster</h1>
+            <div class="user-actions">
+                {% if current_user.is_authenticated %}
+                    
+                    <!-- Novo Botão Deslizante (Switch) -->
+                    <a href="{{ url_for('auth.toggle_theme') }}" class="theme-switch" title="Alternar Tema" onclick="toggleTheme(event, this.href)">
+                        <span class="icon-sun">☀️</span>
+                        <span class="switch-thumb"></span>
+                        <span class="icon-moon">🌙</span>
+                    </a>
+
+                    <span class="user-greeting">{{ current_user.username }}</span>
+                    <a href="{{ url_for('auth.logout') }}" class="nav-link">Sair</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <body class="{% if current_user.is_authenticated and current_user.dark_mode %}dark-theme{% endif %}"></body>
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+    <script>
+        function toggleTheme(event, url) {
+            // 1. Impede que o clique recarregue a página
+            event.preventDefault(); 
+            
+            // 2. Alterna a classe no body IMEDIATAMENTE (isso dispara a pintura suave do CSS)
+            document.body.classList.toggle('dark-theme');
+            
+            // 3. Avisa o Flask silenciosamente em segundo plano para salvar no banco
+            fetch(url);
+        }
+    </script>
+</html>

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="header-section">
+        <h2 class="page-title">Tarefas</h2>
+    </div>
+    
+    <form method="POST" action="{{ url_for('tasks.home') }}" class="task-form">
+        <input type="text" name="title" class="input-field" placeholder="O que precisa ser feito?" required>
+        <input type="text" name="description" class="input-field" placeholder="Detalhes (opcional)">
+        <button type="submit" class="btn btn-primary">Adicionar</button>
+    </form>
+
+    <ul class="task-list">
+    {% for task in tasks %}
+        <li class="task-item {% if task.status %}completed{% endif %}">
+            <div class="task-content">
+                <span class="task-title">{{ task.title }}</span>
+                {% if task.description %}
+                    <span class="task-desc">{{ task.description }}</span>
+                {% endif %}
+            </div>
+
+            <div class="task-actions">
+                <a href="{{ url_for('tasks.toggle_task', task_id=task.id) }}" class="btn btn-outline">
+                    {% if task.status %} Desfazer {% else %} Concluir {% endif %}
+                </a>
+                
+                <!-- Botão que chama o modal -->
+                <button type="button" class="btn btn-text" onclick="openDeleteModal('{{ url_for('tasks.delete_task', task_id=task.id) }}')">
+                    Excluir
+                </button>
+            </div>
+        </li>
+    {% else %}
+        <li class="empty-state">Nenhuma tarefa no momento. Crie uma acima.</li>
+    {% endfor %}
+    </ul>
+
+    <!-- MODAL (Fica oculto até ser chamado) -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top: 0;">Excluir Tarefa</h3>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">Cancelar</button>
+                <a id="confirmDeleteBtn" href="#" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger);">Excluir</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DO MODAL -->
+    <script>
+        function openDeleteModal(deleteUrl) {
+            document.getElementById('deleteModal').style.display = 'flex';
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+    </script>
+{% endblock %}
