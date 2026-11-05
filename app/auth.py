@@ -14,6 +14,11 @@ def register():
         
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, password_hash=hashed_password)
+
+        usuario_existente = User.query.filter_by(username=username).first()
+        if usuario_existente:
+            # Se o usuário já existe, recarrega a página e cancela o salvamento
+            return redirect(url_for('auth.register'))
         
         db.session.add(new_user)
         db.session.commit()
@@ -52,3 +57,4 @@ def toggle_theme():
     # request.referrer tenta devolver o usuário para a página em que ele clicou no botão
     # Se não conseguir, manda ele de volta pro dashboard (tasks.home)
     return redirect(request.referrer or url_for('tasks.home'))
+
