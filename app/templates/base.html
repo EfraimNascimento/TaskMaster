@@ -2,80 +2,131 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>TaskMaster SaaS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
     <style>
-        /* 1. O Motor de Temas (Variáveis CSS) */
+        /* 1. Design Tokens (Variáveis de Tema de Alto Contraste) */
         :root {
-            --sidebar-width: 280px;
-        }
-        .theme-ocean {
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --text-color: #2c3e50;
-        }
-        .theme-dark-glass {
-            --bg-gradient: linear-gradient(135deg, #141e30 0%, #243b55 100%);
-            --glass-bg: rgba(20, 20, 20, 0.55);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-color: #f8f9fa;
-        }
-        .theme-sunset {
-            --bg-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            --glass-bg: rgba(255, 255, 255, 0.5);
-            --glass-border: rgba(255, 255, 255, 0.3);
-            --text-color: #333;
-        }
-        .theme-amethyst {
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-color: #fff;
+            --sidebar-width: 260px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
         }
 
-        /* 2. Aplicação do Glassmorphism */
+        /* Tema: Claro Moderno (Estilo Vercel/Stripe) */
+        .theme-light {
+            --bg-canvas: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-subtle: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-primary: #4f46e5; /* Indigo */
+            --accent-hover: #4338ca;
+            --shadow-soft: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+
+        /* Tema: Escuro Sofisticado (Estilo Linear) */
+        .theme-dark {
+            --bg-canvas: #0f172a;
+            --bg-surface: #1e293b;
+            --border-subtle: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-hover: #818cf8;
+            --shadow-soft: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+
+        /* Tema: Midnight Purple */
+        .theme-midnight {
+            --bg-canvas: #171527;
+            --bg-surface: #231f3a;
+            --border-subtle: #3d3761;
+            --text-main: #fdfcff;
+            --text-muted: #a7a1c9;
+            --accent-primary: #9f7aea;
+            --accent-hover: #b794f4;
+            --shadow-soft: 0 10px 15px -3px rgba(0,0,0,0.4);
+        }
+
+        /* 2. Reset Base e Aplicação de Cores */
         body {
-            background: var(--bg-gradient);
-            color: var(--text-color);
-            min-height: 100vh;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-        
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-        }
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
         }
 
-        /* 3. Estrutura do App (Grid Layout) */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
+        a { color: var(--accent-primary); text-decoration: none; }
+        a:hover { color: var(--accent-hover); }
+
+        /* 3. Componentes SaaS (Substitutos do Bootstrap padrão) */
+        .modern-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-soft);
+            color: var(--text-main);
+            padding: 1.5rem;
         }
+
+        .modern-input {
+            background-color: var(--bg-canvas);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1rem;
+        }
+        .modern-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-accent {
+            background-color: var(--accent-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-accent:hover { background-color: var(--accent-hover); color: #ffffff; }
+
+        /* 4. Estrutura do Layout */
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Lateral */
         .sidebar {
             width: var(--sidebar-width);
-            height: 100%;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
             overflow-y: auto;
-            border-right: 1px solid var(--glass-border);
         }
         
-        /* Área Principal */
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: var(--bg-canvas);
+            color: var(--accent-primary);
+        }
+
         .main-content {
             flex: 1;
             display: flex;
@@ -83,118 +134,105 @@
             overflow-y: auto;
         }
         
-        /* Menu Superior (Top Bar) */
-        .top-bar {
-            height: 70px;
+        .topbar {
+            height: 72px;
+            background-color: var(--bg-canvas);
+            border-bottom: 1px solid var(--border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
-            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
+
+        /* Correções Bootstrap para temas escuros */
+        .dropdown-menu { background-color: var(--bg-surface); border-color: var(--border-subtle); }
+        .dropdown-item { color: var(--text-main); }
+        .dropdown-item:hover { background-color: var(--bg-canvas); color: var(--accent-primary); }
+        .text-muted-custom { color: var(--text-muted) !important; }
     </style>
 </head>
 
-<!-- O body injeta a classe do tema escolhido pelo usuário! -->
-<body class="{{ current_user.theme if current_user.is_authenticated else 'theme-ocean' }}">
+<!-- Puxa o tema do banco de dados (ajuste os nomes no settings.html) -->
+<body class="{{ current_user.theme if current_user.is_authenticated and current_user.theme else 'theme-light' }}">
     
     <div class="app-container">
         {% if current_user.is_authenticated %}
-        <!-- SIDEBAR LATERAL (Social & Navegação) -->
-        <aside class="sidebar glass-panel p-3">
-            <h4 class="mb-4 fw-bold">TaskMaster</h4>
+        <aside class="sidebar">
+            <div class="d-flex align-items-center gap-2 mb-4 px-2">
+                <i class="bi bi-check-all fs-3" style="color: var(--accent-primary);"></i>
+                <h4 class="m-0 fw-bold">TaskMaster</h4>
+            </div>
             
-            <!-- Convites Pendentes -->
             {% if sidebar_convites %}
-            <div class="alert alert-info py-1 px-2 mb-3 shadow-sm">
-                <small><i class="bi bi-bell-fill"></i> Você tem {{ sidebar_convites|length }} convite(s)!</small>
-                <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-sm btn-primary d-block mt-1">Ver</a>
+            <div class="alert alert-warning py-2 px-3 border-0 shadow-sm" style="border-radius: var(--radius-sm);">
+                <small class="fw-bold"><i class="bi bi-bell-fill"></i> {{ sidebar_convites|length }} Convite(s)</small>
+                <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-sm btn-dark w-100 mt-2">Verificar</a>
             </div>
             {% endif %}
 
-            <!-- Lista de Grupos -->
-            <h6 class="text-uppercase text-muted fw-bold mt-4"><i class="bi bi-collection-fill"></i> Meus Grupos</h6>
-            <ul class="nav flex-column mb-3">
-                {% for grupo in sidebar_grupos %}
-                <li class="nav-item">
-                    <a class="nav-link text-reset py-1" href="{{ url_for('tasks.group_board', group_id=grupo.id) }}">
-                        # {{ grupo.name }}
-                    </a>
-                </li>
-                {% else %}
-                <li class="nav-item"><small class="text-muted ps-3">Nenhum grupo ativo.</small></li>
-                {% endfor %}
-            </ul>
+            <small class="text-uppercase fw-bold text-muted-custom mt-2 mb-2 px-2" style="font-size: 0.75rem;">Workspace</small>
+            <a href="{{ url_for('tasks.home') }}" class="sidebar-link {% if request.endpoint == 'tasks.home' %}active{% endif %}">
+                <i class="bi bi-house-door"></i> Minhas Tarefas
+            </a>
+            <a href="{{ url_for('tasks.social_dashboard') }}" class="sidebar-link {% if request.endpoint == 'tasks.social_dashboard' %}active{% endif %}">
+                <i class="bi bi-people"></i> Gerenciar Social
+            </a>
 
-            <!-- Lista de Amigos -->
-            <h6 class="text-uppercase text-muted fw-bold mt-4"><i class="bi bi-people-fill"></i> Meus Amigos</h6>
-            <ul class="nav flex-column">
-                {% for amigo in sidebar_amigos %}
-                <li class="nav-item">
-                    <span class="nav-link text-reset py-1"><i class="bi bi-person"></i> {{ amigo.username }}</span>
-                </li>
-                {% else %}
-                <li class="nav-item"><small class="text-muted ps-3">Nenhum amigo adicionado.</small></li>
-                {% endfor %}
-            </ul>
-            
-            <hr class="my-4">
-            <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-outline-secondary btn-sm w-100 glass-btn">Gerenciar Social</a>
+            <small class="text-uppercase fw-bold text-muted-custom mt-4 mb-2 px-2" style="font-size: 0.75rem;">Meus Grupos</small>
+            {% for grupo in sidebar_grupos %}
+            <a href="{{ url_for('tasks.group_board', group_id=grupo.id) }}" class="sidebar-link {% if request.view_args and request.view_args.get('group_id') == grupo.id %}active{% endif %}">
+                <i class="bi bi-hash"></i> {{ grupo.name }}
+            </a>
+            {% else %}
+            <span class="px-2 text-muted-custom" style="font-size: 0.85rem;">Nenhum grupo ativo.</span>
+            {% endfor %}
         </aside>
         {% endif %}
 
-        <!-- ÁREA PRINCIPAL -->
         <main class="main-content">
-            <!-- Top Nav / Menu do Usuário -->
-            <header class="top-bar glass-panel">
+            <header class="topbar">
                 <div>
-                    <!-- O BOTÃO DINÂMICO: Ele sabe onde você está e aponta para o outro lado! -->
-                    {% if current_user.is_authenticated %}
-                        {% if request.endpoint == 'tasks.home' %}
-                            <!-- Se estou nas tarefas privadas, mostro atalho para a área social -->
-                            <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-primary btn-sm glass-btn shadow-sm">
-                                <i class="bi bi-share"></i> Ver Convites & Grupos
-                            </a>
-                        {% else %}
-                            <!-- Se estou em qualquer outro lugar (Grupos, Settings), mostro atalho para as tarefas privadas -->
-                            <a href="{{ url_for('tasks.home') }}" class="btn btn-dark btn-sm shadow-sm">
-                                <i class="bi bi-house-door"></i> Ir para Minhas Tarefas
-                            </a>
-                        {% endif %}
-                    {% endif %}
+                    <!-- Espaço para breadcrumbs ou título da página no futuro -->
                 </div>
                 
-                <div class="user-menu dropdown">
+                <div class="dropdown">
                     {% if current_user.is_authenticated %}
-                        <a href="#" class="text-reset text-decoration-none dropdown-toggle fw-bold" id="userMenu" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                        <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" style="color: var(--text-main); font-weight: 500;" data-bs-toggle="dropdown">
+                            <div style="width: 35px; height: 35px; border-radius: 50%; background-color: var(--accent-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                {{ current_user.username[0]|upper }}
+                            </div>
+                            {{ current_user.username }}
+                            <i class="bi bi-chevron-down" style="font-size: 0.75rem;"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end glass-card shadow">
-                            <li><a class="dropdown-item" href="{{ url_for('tasks.user_settings') }}"><i class="bi bi-gear"></i> Configurações</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius: var(--radius-sm);">
+                            <li><a class="dropdown-item py-2" href="{{ url_for('tasks.user_settings') }}"><i class="bi bi-gear me-2"></i> Configurações</a></li>
+                            <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
                         </ul>
                     {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Login</a>
+                        <a href="{{ url_for('auth.login') }}" class="btn-accent text-decoration-none">Entrar</a>
                     {% endif %}
                 </div>
             </header>
 
-            <!-- Área de Conteúdo Central (Onde os outros arquivos HTML são carregados) -->
-            <div class="p-4" style="flex: 1; overflow-y: auto;">
-                <!-- Flashes -->
+            <!-- Conteúdo Injetado -->
+            <div class="p-4 p-md-5">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category if category != 'error' else 'danger' }} glass-card alert-dismissible fade show">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            <div class="modern-card mb-4 border-start border-4 border-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'primary' }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">{{ message }}</span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: var(--text-main) == '#f8fafc' ? 'invert(1)' : 'none';"></button>
+                                </div>
                             </div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
 
-                <!-- Bloco que será substituído pelos outros templates -->
                 {% block content %}{% endblock %}
             </div>
         </main>

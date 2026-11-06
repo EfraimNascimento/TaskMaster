@@ -33,7 +33,7 @@
                     </form>
                     
                     <!-- O Botão de Excluir Correto -->
-                    <form action="{{ url_for('tasks.delete_task', id=task.id) }}" method="POST">
+                    <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST">
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Excluir esta tarefa?')">
                             <i class="bi bi-trash"></i> Excluir
                         </button>
