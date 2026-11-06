@@ -39,6 +39,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     dark_mode = db.Column(db.Boolean, default=False)
+    theme = db.Column(db.String(50), default='theme-ocean')
     
     # Tarefas individuais do usuário
     tasks = db.relationship('Task', backref='owner', lazy=True, foreign_keys='Task.user_id')

@@ -24,17 +24,21 @@
             </div>
 
             <div class="task-actions">
-                <a href="{{ url_for('tasks.toggle_task', task_id=task.id) }}" class="btn btn-outline">
-                    {% if task.status %} Desfazer {% else %} Concluir {% endif %}
-                </a>
-                
-                <!-- Guardamos a URL gerada em uma variável Jinja pura -->
-                {% set url_delete = url_for('tasks.delete_task', task_id=task.id) %}
-                
-                <!-- Usamos a variável diretamente, evitando conflitos de aspas -->
-                <button type="button" class="btn btn-text" onclick="openDeleteModal('{{ url_delete }}')">
-                    Excluir
-                </button>
+                <div class="d-flex gap-2">
+                    <!-- O Botão Inteligente de Status -->
+                    <form action="{{ url_for('tasks.toggle_task_status_html', task_id=task.id) }}" method="POST">
+                        <button type="submit" class="btn btn-sm {{ 'btn-outline-warning' if task.status else 'btn-success' }}">
+                            <i class="bi bi-check2-circle"></i> {{ 'Reabrir' if task.status else 'Completar' }}
+                        </button>
+                    </form>
+                    
+                    <!-- O Botão de Excluir Correto -->
+                    <form action="{{ url_for('tasks.delete_task', id=task.id) }}" method="POST">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Excluir esta tarefa?')">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </form>
+                </div>
             </div>
         </li>
     {% else %}

@@ -1,0 +1,81 @@
+<!-- templates/social.html -->
+{% extends "base.html" %} <!-- Aproveita o layout padrão do seu site -->
+
+{% block content %}
+<div class="container">
+    <h1>Meu Painel Social</h1>
+   
+    {% if convites %}
+    <div class="alert alert-info">
+        <h3>Convites Pendentes</h3>
+        <ul>
+            {% for convite in convites %}
+            <li>
+                <!-- Graças ao backref='sender' no models.py, o Jinja sabe quem enviou! -->
+                <strong>{{ convite.sender.username }}</strong> quer ser seu amigo.
+                
+                <!-- Formulário com o botão de aceitar -->
+                <!-- Graças ao backref='sender' no models.py, o Jinja sabe quem enviou! -->
+                <strong>{{ convite.sender.username }}</strong> quer ser seu amigo.
+
+                <!-- Botão VERDE de Aceitar -->
+                <form action="{{ url_for('tasks.accept_friend_request_html', friendship_id=convite.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Aceitar</button>
+                </form>
+
+                <!-- Botão VERMELHO de Recusar -->
+                <form action="{{ url_for('tasks.reject_friend_request_html', friendship_id=convite.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Recusar</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <hr>
+    {% endif %}
+
+    <hr>
+    <h2>Meus Amigos</h2>
+    <ul>
+        <!-- O Jinja2 repete a tag <li> para cada amigo na lista -->
+        {% for amigo in amigos %}
+            <li>
+                <strong>{{ amigo.username }}</strong>
+                
+                <!-- Botão de Desfazer Amizade -->
+                <form action="{{ url_for('tasks.remove_friend_html', amigo_id=amigo.id) }}" method="POST" style="display:inline; margin-left: 15px;">
+                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este amigo?')">Desfazer Amizade</button>
+                </form>
+            </li>
+        {% else %}
+            <p>Você ainda não tem amigos adicionados.</p>
+        {% endfor %}
+        <!-- Adicione isso logo após o encerramento do <ul> de "Meus Amigos" -->
+        
+    </ul>
+    <hr>
+    <h3>Buscar Usuário</h3>
+    <form action="{{ url_for('tasks.send_friend_request_html') }}" method="POST">
+        <input type="text" name="friend_username" placeholder="Digite o nome exato do usuário" required>
+        <button type="submit" class="btn btn-primary">Adicionar Amigo</button>
+    </form>
+
+    <hr>
+    <h2>Meus Grupos</h2>
+    <!-- Formulário HTML puro para criar grupo, apontando para a rota de criação -->
+    <form action="{{ url_for('tasks.create_group_html') }}" method="POST">
+        <input type="text" name="group_name" placeholder="Nome do Novo Grupo" required>
+        <button type="submit">Criar Grupo</button>
+    </form>
+
+    <ul>
+        {% for grupo in grupos %}
+            <li>
+                <strong>{{ grupo.name }}</strong> 
+                <!-- Link para abrir o quadro de tarefas do grupo -->
+                <a href="{{ url_for('tasks.group_board', group_id=grupo.id) }}">Ver Quadro</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

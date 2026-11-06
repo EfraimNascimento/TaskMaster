@@ -1,51 +1,205 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster - {% block title %}{% endblock %}</title>
-    <!-- Fonte Clean: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <header class="navbar">
-        <div class="nav-container">
-            <h1 class="logo">TaskMaster</h1>
-            <div class="user-actions">
-                {% if current_user.is_authenticated %}
-                    
-                    <!-- Novo Botão Deslizante (Switch) -->
-                    <a href="{{ url_for('auth.toggle_theme') }}" class="theme-switch" title="Alternar Tema" onclick="toggleTheme(event, this.href)">
-                        <span class="icon-sun">☀️</span>
-                        <span class="switch-thumb"></span>
-                        <span class="icon-moon">🌙</span>
-                    </a>
-
-                    <span class="user-greeting">{{ current_user.username }}</span>
-                    <a href="{{ url_for('auth.logout') }}" class="nav-link">Sair</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
-                {% endif %}
-            </div>
-        </div>
-    </header>
-    <body class="{% if current_user.is_authenticated and current_user.dark_mode %}dark-theme{% endif %}"></body>
-    <main class="container">
-        {% block content %}
-        {% endblock %}
-    </main>
-</body>
-    <script>
-        function toggleTheme(event, url) {
-            // 1. Impede que o clique recarregue a página
-            event.preventDefault(); 
-            
-            // 2. Alterna a classe no body IMEDIATAMENTE (isso dispara a pintura suave do CSS)
-            document.body.classList.toggle('dark-theme');
-            
-            // 3. Avisa o Flask silenciosamente em segundo plano para salvar no banco
-            fetch(url);
+    <title>TaskMaster SaaS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        /* 1. O Motor de Temas (Variáveis CSS) */
+        :root {
+            --sidebar-width: 280px;
         }
-    </script>
+        .theme-ocean {
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-color: #2c3e50;
+        }
+        .theme-dark-glass {
+            --bg-gradient: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+            --glass-bg: rgba(20, 20, 20, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #f8f9fa;
+        }
+        .theme-sunset {
+            --bg-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            --glass-bg: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #333;
+        }
+        .theme-amethyst {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #fff;
+        }
+
+        /* 2. Aplicação do Glassmorphism */
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        /* 3. Estrutura do App (Grid Layout) */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Sidebar Lateral */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100%;
+            overflow-y: auto;
+            border-right: 1px solid var(--glass-border);
+        }
+        
+        /* Área Principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        /* Menu Superior (Top Bar) */
+        .top-bar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+    </style>
+</head>
+
+<!-- O body injeta a classe do tema escolhido pelo usuário! -->
+<body class="{{ current_user.theme if current_user.is_authenticated else 'theme-ocean' }}">
+    
+    <div class="app-container">
+        {% if current_user.is_authenticated %}
+        <!-- SIDEBAR LATERAL (Social & Navegação) -->
+        <aside class="sidebar glass-panel p-3">
+            <h4 class="mb-4 fw-bold">TaskMaster</h4>
+            
+            <!-- Convites Pendentes -->
+            {% if sidebar_convites %}
+            <div class="alert alert-info py-1 px-2 mb-3 shadow-sm">
+                <small><i class="bi bi-bell-fill"></i> Você tem {{ sidebar_convites|length }} convite(s)!</small>
+                <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-sm btn-primary d-block mt-1">Ver</a>
+            </div>
+            {% endif %}
+
+            <!-- Lista de Grupos -->
+            <h6 class="text-uppercase text-muted fw-bold mt-4"><i class="bi bi-collection-fill"></i> Meus Grupos</h6>
+            <ul class="nav flex-column mb-3">
+                {% for grupo in sidebar_grupos %}
+                <li class="nav-item">
+                    <a class="nav-link text-reset py-1" href="{{ url_for('tasks.group_board', group_id=grupo.id) }}">
+                        # {{ grupo.name }}
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item"><small class="text-muted ps-3">Nenhum grupo ativo.</small></li>
+                {% endfor %}
+            </ul>
+
+            <!-- Lista de Amigos -->
+            <h6 class="text-uppercase text-muted fw-bold mt-4"><i class="bi bi-people-fill"></i> Meus Amigos</h6>
+            <ul class="nav flex-column">
+                {% for amigo in sidebar_amigos %}
+                <li class="nav-item">
+                    <span class="nav-link text-reset py-1"><i class="bi bi-person"></i> {{ amigo.username }}</span>
+                </li>
+                {% else %}
+                <li class="nav-item"><small class="text-muted ps-3">Nenhum amigo adicionado.</small></li>
+                {% endfor %}
+            </ul>
+            
+            <hr class="my-4">
+            <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-outline-secondary btn-sm w-100 glass-btn">Gerenciar Social</a>
+        </aside>
+        {% endif %}
+
+        <!-- ÁREA PRINCIPAL -->
+        <main class="main-content">
+            <!-- Top Nav / Menu do Usuário -->
+            <header class="top-bar glass-panel">
+                <div>
+                    <!-- O BOTÃO DINÂMICO: Ele sabe onde você está e aponta para o outro lado! -->
+                    {% if current_user.is_authenticated %}
+                        {% if request.endpoint == 'tasks.home' %}
+                            <!-- Se estou nas tarefas privadas, mostro atalho para a área social -->
+                            <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-primary btn-sm glass-btn shadow-sm">
+                                <i class="bi bi-share"></i> Ver Convites & Grupos
+                            </a>
+                        {% else %}
+                            <!-- Se estou em qualquer outro lugar (Grupos, Settings), mostro atalho para as tarefas privadas -->
+                            <a href="{{ url_for('tasks.home') }}" class="btn btn-dark btn-sm shadow-sm">
+                                <i class="bi bi-house-door"></i> Ir para Minhas Tarefas
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <div class="user-menu dropdown">
+                    {% if current_user.is_authenticated %}
+                        <a href="#" class="text-reset text-decoration-none dropdown-toggle fw-bold" id="userMenu" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end glass-card shadow">
+                            <li><a class="dropdown-item" href="{{ url_for('tasks.user_settings') }}"><i class="bi bi-gear"></i> Configurações</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                        </ul>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Login</a>
+                    {% endif %}
+                </div>
+            </header>
+
+            <!-- Área de Conteúdo Central (Onde os outros arquivos HTML são carregados) -->
+            <div class="p-4" style="flex: 1; overflow-y: auto;">
+                <!-- Flashes -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category if category != 'error' else 'danger' }} glass-card alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Bloco que será substituído pelos outros templates -->
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
