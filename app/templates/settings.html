@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="glass-card p-4">
-    <h2><i class="bi bi-gear"></i> Minhas Configurações</h2>
-    <hr>
-    <form action="{{ url_for('tasks.user_settings') }}" method="POST">
-        <div class="mb-3">
-            <label class="form-label fw-bold">Paleta de Cores (Interface)</label>
-            <select name="theme" class="form-select glass-input">
-                <option value="theme-ocean" {% if current_user.theme == 'theme-ocean' %}selected{% endif %}>Ocean Blue (Claro/Profissional)</option>
-                <option value="theme-dark-glass" {% if current_user.theme == 'theme-dark-glass' %}selected{% endif %}>Dark Glass (Noturno/Hacker)</option>
-                <option value="theme-sunset" {% if current_user.theme == 'theme-sunset' %}selected{% endif %}>Sunset (Quente/Criativo)</option>
-                <option value="theme-amethyst" {% if current_user.theme == 'theme-amethyst' %}selected{% endif %}>Amethyst (Roxo/Moderno)</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary glass-btn">Salvar Tema</button>
-    </form>
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 class="mb-4 fw-bold">Configurações</h2>
+    
+    <div class="modern-card">
+        <h5 class="mb-3"><i class="bi bi-palette"></i> Preferências Visuais</h5>
+        <hr style="border-color: var(--border-subtle);">
+        
+        <form action="{{ url_for('tasks.user_settings') }}" method="POST">
+            <div class="mb-4">
+                <label class="form-label text-muted-custom fw-bold">Tema da Interface</label>
+                <select name="theme" class="form-select modern-input w-100">
+                    <option value="theme-light" {% if current_user.theme == 'theme-light' %}selected{% endif %}>Claro Moderno</option>
+                    <option value="theme-dark" {% if current_user.theme == 'theme-dark' %}selected{% endif %}>Escuro Sofisticado</option>
+                    <option value="theme-midnight" {% if current_user.theme == 'theme-midnight' %}selected{% endif %}>Midnight Purple</option>
+                    <option value="theme-ocean" {% if current_user.theme == 'theme-ocean' %}selected{% endif %}>Ocean Blue</option>
+                    <option value="theme-sunset" {% if current_user.theme == 'theme-sunset' %}selected{% endif %}>Sunset Coral</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-accent w-100">Salvar Alterações</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

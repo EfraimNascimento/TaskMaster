@@ -1,81 +1,89 @@
-<!-- templates/social.html -->
-{% extends "base.html" %} <!-- Aproveita o layout padrão do seu site -->
+{% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1>Meu Painel Social</h1>
-   
-    {% if convites %}
-    <div class="alert alert-info">
-        <h3>Convites Pendentes</h3>
-        <ul>
-            {% for convite in convites %}
-            <li>
-                <!-- Graças ao backref='sender' no models.py, o Jinja sabe quem enviou! -->
-                <strong>{{ convite.sender.username }}</strong> quer ser seu amigo.
-                
-                <!-- Formulário com o botão de aceitar -->
-                <!-- Graças ao backref='sender' no models.py, o Jinja sabe quem enviou! -->
-                <strong>{{ convite.sender.username }}</strong> quer ser seu amigo.
+<div class="mb-4">
+    <h2 class="fw-bold">Gestão Social</h2>
+    <p class="text-muted-custom">Administre seus contatos e crie novos grupos de trabalho.</p>
+</div>
 
-                <!-- Botão VERDE de Aceitar -->
-                <form action="{{ url_for('tasks.accept_friend_request_html', friendship_id=convite.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-success btn-sm">Aceitar</button>
+<!-- Alerta de Convites Pendentes -->
+{% if convites %}
+<div class="modern-card mb-5 border-start border-4 border-warning">
+    <h5 class="fw-bold mb-3 text-warning" style="filter: brightness(0.9);"><i class="bi bi-envelope-paper"></i> Convites Pendentes</h5>
+    <div class="d-flex flex-column gap-3">
+        {% for convite in convites %}
+        <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background-color: var(--bg-canvas); border: 1px solid var(--border-subtle);">
+            <span class="fw-medium"><strong>{{ convite.sender.username }}</strong> quer adicionar você.</span>
+            <div class="d-flex gap-2">
+                <form action="{{ url_for('tasks.accept_friend_request_html', friendship_id=convite.id) }}" method="POST">
+                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Aceitar</button>
                 </form>
-
-                <!-- Botão VERMELHO de Recusar -->
-                <form action="{{ url_for('tasks.reject_friend_request_html', friendship_id=convite.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm">Recusar</button>
+                <form action="{{ url_for('tasks.reject_friend_request_html', friendship_id=convite.id) }}" method="POST">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Recusar</button>
                 </form>
-            </li>
-            {% endfor %}
-        </ul>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    <hr>
-    {% endif %}
+</div>
+{% endif %}
 
-    <hr>
-    <h2>Meus Amigos</h2>
-    <ul>
-        <!-- O Jinja2 repete a tag <li> para cada amigo na lista -->
-        {% for amigo in amigos %}
-            <li>
-                <strong>{{ amigo.username }}</strong>
-                
-                <!-- Botão de Desfazer Amizade -->
-                <form action="{{ url_for('tasks.remove_friend_html', amigo_id=amigo.id) }}" method="POST" style="display:inline; margin-left: 15px;">
-                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Tem certeza que deseja remover este amigo?')">Desfazer Amizade</button>
-                </form>
-            </li>
-        {% else %}
-            <p>Você ainda não tem amigos adicionados.</p>
-        {% endfor %}
-        <!-- Adicione isso logo após o encerramento do <ul> de "Meus Amigos" -->
-        
-    </ul>
-    <hr>
-    <h3>Buscar Usuário</h3>
-    <form action="{{ url_for('tasks.send_friend_request_html') }}" method="POST">
-        <input type="text" name="friend_username" placeholder="Digite o nome exato do usuário" required>
-        <button type="submit" class="btn btn-primary">Adicionar Amigo</button>
-    </form>
+<!-- Painéis Lado a Lado -->
+<div class="row g-4">
+    <!-- Coluna de Amigos -->
+    <div class="col-md-6">
+        <div class="modern-card h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-person-plus"></i> Adicionar Amigo</h5>
+            <form action="{{ url_for('tasks.send_friend_request_html') }}" method="POST" class="d-flex gap-2 mb-4">
+                <input type="text" name="friend_username" class="modern-input flex-grow-1" placeholder="Nome exato do usuário" required>
+                <button type="submit" class="btn-accent">Buscar</button>
+            </form>
 
-    <hr>
-    <h2>Meus Grupos</h2>
-    <!-- Formulário HTML puro para criar grupo, apontando para a rota de criação -->
-    <form action="{{ url_for('tasks.create_group_html') }}" method="POST">
-        <input type="text" name="group_name" placeholder="Nome do Novo Grupo" required>
-        <button type="submit">Criar Grupo</button>
-    </form>
+            <h5 class="fw-bold mb-3 mt-5"><i class="bi bi-people"></i> Minha Rede</h5>
+            <div class="d-flex flex-column gap-2">
+                {% for amigo in amigos %}
+                <div class="d-flex justify-content-between align-items-center p-3 rounded" style="border: 1px solid var(--border-subtle); background-color: var(--bg-canvas);">
+                    <span class="fw-medium"><i class="bi bi-person-circle text-muted-custom me-2"></i> {{ amigo.username }}</span>
+                    <form action="{{ url_for('tasks.remove_friend_html', amigo_id=amigo.id) }}" method="POST">
+                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="return confirm('Remover este amigo de sua rede?')">
+                            <i class="bi bi-trash fs-5"></i>
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="p-3 text-center rounded" style="border: 1px dashed var(--border-subtle);">
+                    <p class="text-muted-custom small mb-0">Você ainda não possui amigos na sua rede.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
-    <ul>
-        {% for grupo in grupos %}
-            <li>
-                <strong>{{ grupo.name }}</strong> 
-                <!-- Link para abrir o quadro de tarefas do grupo -->
-                <a href="{{ url_for('tasks.group_board', group_id=grupo.id) }}">Ver Quadro</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <!-- Coluna de Grupos -->
+    <div class="col-md-6">
+        <div class="modern-card h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-plus-square"></i> Criar Workspace</h5>
+            <form action="{{ url_for('tasks.create_group_html') }}" method="POST" class="d-flex gap-2 mb-4">
+                <input type="text" name="group_name" class="modern-input flex-grow-1" placeholder="Nome do novo grupo" required>
+                <button type="submit" class="btn-accent">Criar</button>
+            </form>
+
+            <h5 class="fw-bold mb-3 mt-5"><i class="bi bi-collection"></i> Meus Workspaces</h5>
+            <div class="d-flex flex-column gap-2">
+                {% for grupo in grupos %}
+                <div class="d-flex justify-content-between align-items-center p-3 rounded" style="border: 1px solid var(--border-subtle); background-color: var(--bg-canvas);">
+                    <span class="fw-medium"><i class="bi bi-hash text-muted-custom me-2"></i> {{ grupo.name }}</span>
+                    <a href="{{ url_for('tasks.group_board', group_id=grupo.id) }}" class="btn btn-sm btn-outline-secondary">
+                        Acessar <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                {% else %}
+                <div class="p-3 text-center rounded" style="border: 1px dashed var(--border-subtle);">
+                    <p class="text-muted-custom small mb-0">Você não faz parte de nenhum grupo.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

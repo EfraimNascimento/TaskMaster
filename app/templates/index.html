@@ -1,71 +1,52 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
-
 {% block content %}
-    <div class="header-section">
-        <h2 class="page-title">Tarefas</h2>
-    </div>
-    
-    <form method="POST" action="{{ url_for('tasks.home') }}" class="task-form">
-        <input type="text" name="title" class="input-field" placeholder="O que precisa ser feito?" required>
-        <input type="text" name="description" class="input-field" placeholder="Detalhes (opcional)">
-        <button type="submit" class="btn btn-primary">Adicionar</button>
+<div class="mb-4">
+    <h2 class="fw-bold">Minhas Tarefas</h2>
+    <p class="text-muted-custom">Gerencie suas atividades pessoais de forma privada.</p>
+</div>
+
+<!-- Criar Nova Tarefa -->
+<div class="modern-card mb-5">
+    <form action="{{ url_for('tasks.add_task') }}" method="POST" class="d-flex gap-2">
+        <input type="text" name="title" class="form-control" placeholder="Adicionar nova tarefa..." required>
+        <button type="submit" class="btn btn-primary px-4" style="background-color: var(--accent-primary); border:none;">Adicionar</button>
     </form>
+</div>
 
-    <ul class="task-list">
+<!-- Lista de Tarefas -->
+<div>
     {% for task in tasks %}
-        <li class="task-item {% if task.status %}completed{% endif %}">
-            <div class="task-content">
-                <span class="task-title">{{ task.title }}</span>
-                {% if task.description %}
-                    <span class="task-desc">{{ task.description }}</span>
-                {% endif %}
-            </div>
-
-            <div class="task-actions">
-                <div class="d-flex gap-2">
-                    <!-- O Botão Inteligente de Status -->
-                    <form action="{{ url_for('tasks.toggle_task_status_html', task_id=task.id) }}" method="POST">
-                        <button type="submit" class="btn btn-sm {{ 'btn-outline-warning' if task.status else 'btn-success' }}">
-                            <i class="bi bi-check2-circle"></i> {{ 'Reabrir' if task.status else 'Completar' }}
-                        </button>
-                    </form>
-                    
-                    <!-- O Botão de Excluir Correto -->
-                    <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Excluir esta tarefa?')">
-                            <i class="bi bi-trash"></i> Excluir
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </li>
-    {% else %}
-        <li class="empty-state">Nenhuma tarefa no momento. Crie uma acima.</li>
-    {% endfor %}
-    </ul>
-
-    <!-- MODAL (Fica oculto até ser chamado) -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 style="margin-top: 0;">Excluir Tarefa</h3>
-            <p style="color: var(--text-muted); margin-bottom: 2rem;">Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.</p>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">Cancelar</button>
-                <a id="confirmDeleteBtn" href="#" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger);">Excluir</a>
-            </div>
+    <div class="modern-card mb-3 py-3 d-flex justify-content-between align-items-center">
+        <div>
+            {% if task.status %}
+                <del class="text-muted-custom fs-5">{{ task.title }}</del>
+            {% else %}
+                <span class="fs-5 fw-medium">{{ task.title }}</span>
+            {% endif %}
+        </div>
+        
+        <div class="d-flex gap-2">
+            <!-- Botão de Status (Rota Inteligente) -->
+            <form action="{{ url_for('tasks.toggle_task_status_html', task_id=task.id) }}" method="POST">
+                <button type="submit" class="btn btn-sm {{ 'btn-outline-secondary' if task.status else 'btn-success' }}">
+                    <i class="bi bi-check2-circle"></i> {{ 'Reabrir' if task.status else 'Completar' }}
+                </button>
+            </form>
+            
+            <!-- Botão de Deletar -->
+            <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Excluir esta tarefa permanentemente?')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
         </div>
     </div>
-
-    <!-- SCRIPT DO MODAL -->
-    <script>
-        function openDeleteModal(deleteUrl) {
-            document.getElementById('deleteModal').style.display = 'flex';
-            document.getElementById('confirmDeleteBtn').href = deleteUrl;
-        }
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-    </script>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-clipboard-check fs-1 text-muted-custom" style="opacity: 0.5;"></i>
+        <p class="text-muted-custom mt-3">Você não tem tarefas pendentes. Aproveite o dia!</p>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

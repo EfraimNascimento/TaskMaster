@@ -65,18 +65,6 @@ def toggle_task(task_id):
     # Redireciona de volta para o dashboard
     return redirect(url_for('tasks.home'))
 
-@tasks_bp.route('/delete/<int:task_id>')
-@login_required
-def delete_task(task_id):
-    # Busca a tarefe garantindo que ela pertence ao usuário atual
-    task = Task.query.filter_by(id=task_id, user_id=current_user.id).first()
-
-    if task:
-        db.session.delete(task)
-        db.session.commit()
-
-    return redirect(url_for('tasks.home'))
-
 @tasks_bp.route('/social')
 @login_required
 def social_dashboard():
@@ -403,3 +391,59 @@ def delete_group_html(group_id):
         
     return redirect(url_for('tasks.social_dashboard'))
 
+@tasks_bp.route('/add', methods=['POST'])
+@login_required
+def add_task():
+    titulo = request.form.get('title')
+    
+    if titulo:
+        # Cria a tarefa garantindo que ela é privada (group_id=None)
+        nova_tarefa = Task(
+            title=titulo,
+            user_id=current_user.id,
+            group_id=None 
+        )
+        db.session.add(nova_tarefa)
+        db.session.commit()
+        flash('Tarefa adicionada com sucesso!', 'success')
+    else:
+        flash('O título da tarefa não pode estar vazio.', 'error')
+        
+    return redirect(url_for('tasks.home'))
+
+@tasks_bp.route('/delete/<int:task_id>', methods=['POST'])
+@login_required
+def delete_task(task_id):
+    tarefa = Task.query.get(task_id)
+    if not tarefa:
+        flash('Tarefa não encontrada.', 'error')
+        return redirect(request.referrer or url_for('tasks.home'))
+
+    # 1. Regra para Tarefas de Grupo
+    if tarefa.group_id:
+        membro = db.session.query(user_group).filter_by(
+            user_id=current_user.id, group_id=tarefa.group_id
+        ).first()
+        
+        if not membro:
+            flash('Acesso negado.', 'error')
+            return redirect(request.referrer)
+            
+        # Só deleta se for Admin do grupo OU o próprio criador da tarefa
+        if membro.role != 'admin' and tarefa.user_id != current_user.id:
+            flash('Apenas administradores ou o criador da tarefa podem excluí-la.', 'error')
+            return redirect(request.referrer)
+            
+    # 2. Regra para Tarefas Privadas
+    else:
+        if tarefa.user_id != current_user.id:
+            flash('Acesso negado.', 'error')
+            return redirect(request.referrer)
+
+    # Executa a deleção
+    db.session.delete(tarefa)
+    db.session.commit()
+    flash('Tarefa excluída com sucesso!', 'success')
+    
+    # Retorna para a página de onde o usuário veio
+    return redirect(request.referrer or url_for('tasks.home'))

@@ -15,40 +15,20 @@
             --radius-sm: 8px;
         }
 
-        /* Tema: Claro Moderno (Estilo Vercel/Stripe) */
-        .theme-light {
-            --bg-canvas: #f8fafc;
-            --bg-surface: #ffffff;
-            --border-subtle: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent-primary: #4f46e5; /* Indigo */
-            --accent-hover: #4338ca;
-            --shadow-soft: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-        }
+        /* Restauração dos 5 Temas (Adicione dentro do seu <style> no base.html) */
+        .theme-light { --bg-canvas: #f8fafc; --bg-surface: #ffffff; --border-subtle: #e2e8f0; --text-main: #0f172a; --text-muted: #64748b; --accent-primary: #4f46e5; --accent-hover: #4338ca; }
+        .theme-dark { --bg-canvas: #0f172a; --bg-surface: #1e293b; --border-subtle: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --accent-primary: #6366f1; --accent-hover: #818cf8; }
+        .theme-midnight { --bg-canvas: #171527; --bg-surface: #231f3a; --border-subtle: #3d3761; --text-main: #fdfcff; --text-muted: #a7a1c9; --accent-primary: #9f7aea; --accent-hover: #b794f4; }
+        .theme-ocean { --bg-canvas: #e0f2fe; --bg-surface: #ffffff; --border-subtle: #bae6fd; --text-main: #0c4a6e; --text-muted: #0284c7; --accent-primary: #0ea5e9; --accent-hover: #0284c7; }
+        .theme-sunset { --bg-canvas: #fff1f2; --bg-surface: #ffffff; --border-subtle: #fecdd3; --text-main: #881337; --text-muted: #e11d48; --accent-primary: #f43f5e; --accent-hover: #be123c; }
 
-        /* Tema: Escuro Sofisticado (Estilo Linear) */
-        .theme-dark {
-            --bg-canvas: #0f172a;
-            --bg-surface: #1e293b;
-            --border-subtle: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-primary: #6366f1;
-            --accent-hover: #818cf8;
-            --shadow-soft: 0 10px 15px -3px rgba(0,0,0,0.3);
-        }
-
-        /* Tema: Midnight Purple */
-        .theme-midnight {
-            --bg-canvas: #171527;
-            --bg-surface: #231f3a;
-            --border-subtle: #3d3761;
-            --text-main: #fdfcff;
-            --text-muted: #a7a1c9;
-            --accent-primary: #9f7aea;
-            --accent-hover: #b794f4;
-            --shadow-soft: 0 10px 15px -3px rgba(0,0,0,0.4);
+        /* Para garantir que o botão sempre apareça, adicione isto: */
+        .btn-accent {
+            background-color: var(--accent-primary) !important;
+            color: #ffffff !important;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-sm);
         }
 
         /* 2. Reset Base e Aplicação de Cores */

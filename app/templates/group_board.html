@@ -1,115 +1,110 @@
-<!-- templates/group_board.html -->
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <!-- Botão de Voltar -->
-    <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Voltar para o Painel</a>
+<!-- Cabeçalho do Grupo e Ações Destrutivas -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0"><i class="bi bi-hash text-muted-custom"></i> {{ grupo.name }}</h2>
+        <span class="badge mt-2" style="background-color: var(--border-subtle); color: var(--text-main);">Papel: {{ meu_papel|title }}</span>
+    </div>
     
-    <h1>Quadro: {{ grupo.name }}</h1>
-    <p class="text-muted">Seu papel neste grupo: <strong>{{ meu_papel }}</strong></p>
-    <h1>Quadro: {{ grupo.name }}</h1>
-<p class="text-muted">Seu papel neste grupo: <strong>{{ meu_papel }}</strong></p>
-
-    <!-- Bloco de Ações do Grupo (Adicione isto aqui!) -->
-    <div class="mb-4">
+    <div class="d-flex gap-2">
         {% if meu_papel == 'admin' %}
-            <form action="{{ url_for('tasks.delete_group_html', group_id=grupo.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza ABSOLUTA? Isso apagará o grupo inteiro, removendo os membros e deletando todas as tarefas!')">
+            <form action="{{ url_for('tasks.delete_group_html', group_id=grupo.id) }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('ATENÇÃO: Deletar o grupo inteiro e todas as suas tarefas?')">
                     <i class="bi bi-trash"></i> Deletar Grupo
                 </button>
             </form>
         {% else %}
-            <form action="{{ url_for('tasks.leave_group_html', group_id=grupo.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Tem certeza que deseja sair deste grupo?')">
+            <form action="{{ url_for('tasks.leave_group_html', group_id=grupo.id) }}" method="POST">
+                <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Tem certeza que deseja sair deste grupo?')">
                     <i class="bi bi-box-arrow-right"></i> Sair do Grupo
                 </button>
             </form>
         {% endif %}
     </div>
+</div>
 
-    <hr>
-    <hr>
-
-        <!-- Seção da Equipe -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card p-3">
-                <h4>Membros da Equipe</h4>
-                <p>
-                    {% for membro in membros_grupo %}
-                        <span class="badge bg-secondary">{{ membro.username }}</span>
-                    {% endfor %}
-                </p>
-                <!-- O formulário SÓ APARECE se o usuário logado for o admin -->
-                {% if meu_papel == 'admin' %}
-                    <hr>
-                    <form action="{{ url_for('tasks.add_group_member_html', group_id=grupo.id) }}" method="POST" class="d-flex align-items-center">
-                        <select name="friend_id" class="form-select me-2" required>
-                            <option value="" disabled selected>Selecione um amigo...</option>
-                            {% for amigo in amigos_elegiveis %}
-                                <option value="{{ amigo.id }}">{{ amigo.username }}</option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-success text-nowrap">Adicionar ao Grupo</button>
-                    </form>
-                    {% if not amigos_elegiveis %}
-                        <small class="text-muted mt-2 d-block">Todos os seus amigos já estão neste grupo!</small>
-                    {% endif %}
-                {% endif %}
+<!-- Painel de Gestão da Equipe -->
+<div class="modern-card mb-5">
+    <h5 class="fw-bold mb-3"><i class="bi bi-people"></i> Membros da Equipe</h5>
+    
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        {% for membro in membros_grupo %}
+            <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill" style="background-color: var(--bg-canvas); border: 1px solid var(--border-subtle);">
+                <i class="bi bi-person-circle text-muted-custom"></i>
+                <span class="fw-medium" style="font-size: 0.9rem;">{{ membro.username }}</span>
             </div>
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- Formulário para Nova Tarefa -->
-    <div class="card mb-4 p-3 bg-light">
-        <h4>Adicionar Nova Tarefa ao Grupo</h4>
-        <form action="{{ url_for('tasks.create_group_task_html', group_id=grupo.id) }}" method="POST">
-            <input type="text" name="title" placeholder="O que precisa ser feito?" required class="form-control mb-2">
-            <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+    {% if meu_papel == 'admin' %}
+        <hr style="border-color: var(--border-subtle);">
+        <form action="{{ url_for('tasks.add_group_member_html', group_id=grupo.id) }}" method="POST" class="d-flex gap-2 mt-3">
+            <select name="friend_id" class="form-select modern-input flex-grow-1" required>
+                <option value="" disabled selected>Selecione um amigo para convidar...</option>
+                {% for amigo in amigos_elegiveis %}
+                    <option value="{{ amigo.id }}">{{ amigo.username }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-accent text-nowrap"><i class="bi bi-person-plus"></i> Adicionar</button>
+        </form>
+        {% if not amigos_elegiveis %}
+            <small class="text-muted-custom d-block mt-2">Todos os seus amigos já participam deste grupo.</small>
+        {% endif %}
+    {% endif %}
+</div>
+
+<!-- Criar Tarefa do Grupo -->
+<div class="modern-card mb-4">
+    <form action="{{ url_for('tasks.create_group_task_html', group_id=grupo.id) }}" method="POST" class="d-flex gap-3">
+        <input type="text" name="title" class="modern-input flex-grow-1" placeholder="Nova tarefa para a equipe..." required>
+        <button type="submit" class="btn-accent"><i class="bi bi-plus-lg"></i> Adicionar Tarefa</button>
+    </form>
+</div>
+
+<!-- Lista de Tarefas do Grupo -->
+<h5 class="fw-bold mb-3 mt-4">Tarefas do Quadro</h5>
+<div>
+    {% for tarefa in tarefas %}
+    <div class="d-flex gap-2">
+        <!-- Completar -->
+        <form action="{{ url_for('tasks.toggle_task_status_html', task_id=tarefa.id) }}" method="POST">
+            <button type="submit" class="btn btn-sm {{ 'btn-outline-secondary' if tarefa.status else 'btn-success' }}">
+                <i class="bi bi-check2-circle"></i>
+            </button>
+        </form>
+        
+        <!-- Deletar (Rota Inteligente) -->
+        <form action="{{ url_for('tasks.delete_task', task_id=tarefa.id) }}" method="POST">
+            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Excluir esta tarefa compartilhada?')">
+                <i class="bi bi-trash"></i>
+            </button>
         </form>
     </div>
-
-    <!-- Lista de Tarefas do Grupo -->
-    <h3>Tarefas da Equipe</h3>
-    <ul class="list-group">
-        {% for tarefa in tarefas %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <!-- Se a tarefa estiver concluída, coloca um risco no texto (del) -->
-                    {% if tarefa.status %}
-                        <del>{{ tarefa.title }}</del>
-                    {% else %}
-                        <strong>{{ tarefa.title }}</strong>
-                    {% endif %}
-                    
-                    <!-- Mostra quem criou a tarefa. O owner vem do backref='owner' no models.py -->
-                    <br><small class="text-muted">Criada por: {{ tarefa.owner.username if tarefa.owner else 'Sistema' }}</small>
-                </div>
-                
-                <div>
-                    <span class="badge {{ 'bg-success' if tarefa.status else 'bg-warning' }}">
-                        {{ 'Concluída' if tarefa.status else 'Pendente' }}
-                    </span>
-                    <div>
-                        <!-- A badge mostrando o status atual -->
-                        <span class="badge {{ 'bg-success' if tarefa.status else 'bg-warning' }} me-2">
-                            {{ 'Concluída' if tarefa.status else 'Pendente' }}
-                        </span>
-                        
-                        <!-- O Formulário-Botão -->
-                        <form action="{{ url_for('tasks.toggle_task_status_html', task_id=tarefa.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-sm {{ 'btn-outline-warning' if tarefa.status else 'btn-success' }}">
-                                <i class="bi bi-check2-circle"></i> <!-- Opcional: Ícone do Bootstrap -->
-                                {{ 'Reabrir Tarefa' if tarefa.status else 'Completar Tarefa' }}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </li>
-        {% else %}
-            <p>O quadro está vazio. Adicione a primeira tarefa!</p>
-        {% endfor %}
-    </ul>
+    <!-- <div class="modern-card mb-3 py-3 d-flex justify-content-between align-items-center">
+        <div>
+            {% if tarefa.status %}
+                <del class="text-muted-custom fs-5">{{ tarefa.title }}</del>
+            {% else %}
+                <span class="fs-5 fw-medium">{{ tarefa.title }}</span>
+            {% endif %}
+            <br>
+            <small class="text-muted-custom"><i class="bi bi-person-badge"></i> Criada por: {{ tarefa.owner.username if tarefa.owner else 'Sistema' }}</small>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <form action="{{ url_for('tasks.toggle_task_status_html', task_id=tarefa.id) }}" method="POST">
+                <button type="submit" class="btn btn-sm {{ 'btn-outline-secondary' if tarefa.status else 'btn-success' }}">
+                    <i class="bi bi-check2-circle"></i> {{ 'Reabrir' if tarefa.status else 'Completar' }}
+                </button>
+            </form>
+        </div>
+    </div> -->
+    {% else %}
+    <div class="text-center py-4">
+        <p class="text-muted-custom mb-0">O quadro está vazio. Crie a primeira tarefa acima!</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
