@@ -8,23 +8,26 @@
         <span class="modern-badge mt-2 d-inline-block" style="background-color: var(--border-subtle); color: var(--text-main);">Papel: {{ meu_papel }}</span>
     </div>
     
-    <div class="d-flex gap-2 flex-wrap align-items-center">
+    <!-- Cabeçalho de Botões (group_board.html) -->
+    <div class="d-flex gap-2 flex-wrap align-items-stretch">
         {% if meu_papel == 'admin' %}
-            <!-- Botão Convidar: Largura e Altura travadas -->
-            <button type="button" class="modern-btn modern-btn-primary" style="width: 145px; height: 46px;" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-                <i class="bi bi-person-plus"></i> Convidar
-            </button>
+            <!-- Botão Convidar: Envelopado em uma div para imitar a estrutura do Form ao lado -->
+            <div class="m-0 d-flex">
+                <button type="button" class="modern-btn modern-btn-primary" style="width: 145px;" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                    <i class="bi bi-person-plus"></i> Convidar
+                </button>
+            </div>
             
-            <!-- Botão Encerrar: form com d-flex para remover espaços invisíveis -->
+            <!-- Botão Encerrar -->
             <form action="{{ url_for('tasks.delete_group', group_id=grupo.id) }}" method="POST" class="m-0 d-flex">
-                <button type="button" class="modern-btn modern-btn-danger" style="width: 145px; height: 46px;" onclick="showConfirmModal(this.closest('form'), 'Encerrar Grupo', 'Deletar o grupo e todas as tarefas?')">
+                <button type="button" class="modern-btn modern-btn-danger" style="width: 145px;" onclick="showConfirmModal(this.closest('form'), 'Encerrar Grupo', 'Deletar o grupo e todas as tarefas?')">
                     <i class="bi bi-trash"></i> Encerrar
                 </button>
             </form>
         {% else %}
-            <!-- Botão Sair: form com d-flex e dimensões travadas -->
+            <!-- Botão Sair -->
             <form action="{{ url_for('tasks.leave_group', group_id=grupo.id) }}" method="POST" class="m-0 d-flex">
-                <button type="button" class="modern-btn modern-btn-outline" style="width: 145px; height: 46px;" onclick="showConfirmModal(this.closest('form'), 'Sair', 'Sair do grupo?')">
+                <button type="button" class="modern-btn modern-btn-outline" style="width: 145px;" onclick="showConfirmModal(this.closest('form'), 'Sair', 'Sair do grupo?')">
                     <i class="bi bi-box-arrow-right"></i> Sair
                 </button>
             </form>
@@ -55,27 +58,45 @@
 <!-- LISTA DE TAREFAS -->
 <div class="d-flex flex-column gap-3 animate-in delay-2">
     {% for tarefa in tarefas %}
-    <div class="modern-card hover-lift p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div class="d-flex align-items-center gap-3">
-            <i class="{{ 'bi bi-check-circle-fill' if tarefa.status else 'bi bi-circle' }} fs-4 task-status-icon" style="color: {{ 'var(--accent-primary)' if tarefa.status else 'var(--border-subtle)' }};"></i>
-            <div>
-                <span class="fs-5 d-block {{ 'task-completed' if tarefa.status else 'task-pending' }} task-title-text">{{ tarefa.title }}</span>
-                <small style="color: var(--text-muted);">Por: {{ tarefa.owner.username }}</small>
-            </div>
-        </div>
-        <div class="d-flex gap-2">
-            <form action="{{ url_for('tasks.toggle_task', task_id=tarefa.id) }}" method="POST" class="toggle-task-form m-0">
-                <button type="submit" class="modern-btn modern-btn-icon {{ 'modern-btn-outline' if tarefa.status else 'modern-btn-primary' }}" title="{{ 'Reabrir' if tarefa.status else 'Completar' }}">
-                    <i class="{{ 'bi bi-arrow-counterclockwise' if tarefa.status else 'bi bi-check2' }}"></i>
-                </button>
-            </form>
-            <form action="{{ url_for('tasks.delete_task', task_id=tarefa.id) }}" method="POST" class="m-0">
-                <button type="button" class="modern-btn modern-btn-icon modern-btn-danger" title="Excluir" onclick="showConfirmModal(this.closest('form'), 'Excluir Tarefa', 'Excluir tarefa do grupo?')">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </form>
+    <!-- ... (Dentro do loop for tarefa in tarefas) ... -->
+<div class="modern-card hover-lift p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center gap-3">
+        
+        <!-- 1. CORREÇÃO DO ÍCONE (Jinja do lado de fora do style) -->
+        <i class="{% if tarefa.status %}bi bi-check-circle-fill{% else %}bi bi-circle{% endif %} fs-4 task-status-icon" 
+           {% if tarefa.status %}style="color: var(--accent-primary);"{% else %}style="color: var(--border-subtle);"{% endif %}></i>
+        
+        <div>
+            <span class="fs-5 d-block {{ 'task-completed' if tarefa.status else 'task-pending' }} task-title-text">{{ tarefa.title }}</span>
+            <small style="color: var(--text-muted);">Por: {{ tarefa.owner.username }}</small>
         </div>
     </div>
+    
+    <div class="d-flex gap-2 align-items-center">
+        <!-- Botão Completar -->
+        <form action="{{ url_for('tasks.toggle_task', task_id=tarefa.id) }}" method="POST" class="toggle-task-form m-0 d-flex">
+            <button type="submit" class="modern-btn modern-btn-icon {% if tarefa.status %}modern-btn-outline{% else %}modern-btn-primary{% endif %}" title="{{ 'Reabrir' if tarefa.status else 'Completar' }}">
+                <i class="{% if tarefa.status %}bi bi-arrow-counterclockwise{% else %}bi bi-check2{% endif %}"></i>
+            </button>
+        </form>
+
+        <!-- 2. CORREÇÃO DO ONCLICK (Passando a URL por data-action) -->
+        <button type="button" class="modern-btn modern-btn-icon modern-btn-outline d-flex" title="Anotações"
+                data-title="{{ tarefa.title }}" 
+                data-desc="{{ tarefa.description or '' }}"
+                data-action="{{ url_for('tasks.update_description', task_id=tarefa.id) }}"
+                onclick="showDescriptionModal(this.getAttribute('data-action'), this)">
+            <i class="bi bi-text-paragraph"></i>
+        </button>
+        
+        <!-- Botão Excluir -->
+        <form action="{{ url_for('tasks.delete_task', task_id=tarefa.id) }}" method="POST" class="m-0 d-flex">
+            <button type="button" class="modern-btn modern-btn-icon modern-btn-danger" title="Excluir" onclick="showConfirmModal(this.closest('form'), 'Excluir Tarefa', 'Excluir tarefa do grupo?')">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</div>
     {% else %}
     <div class="modern-card text-center py-5" style="border: 2px dashed var(--border-subtle); background: transparent;">
         <i class="bi bi-cup-hot fs-1 mb-3 d-block" style="color: var(--border-subtle);"></i>

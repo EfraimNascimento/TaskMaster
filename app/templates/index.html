@@ -14,24 +14,42 @@
 
 <div class="d-flex flex-column gap-3 animate-in delay-2">
     {% for task in tasks %}
-    <div class="modern-card hover-lift p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div class="d-flex align-items-center gap-3">
-            <i class="{{ 'bi bi-check-circle-fill' if task.status else 'bi bi-circle' }} fs-4 task-status-icon" style="color: {{ 'var(--accent-primary)' if task.status else 'var(--border-subtle)' }};"></i>
-            <span class="fs-5 {{ 'task-completed' if task.status else 'task-pending' }} task-title-text">{{ task.title }}</span>
-        </div>
-        <div class="d-flex gap-2">
-            <form action="{{ url_for('tasks.toggle_task', task_id=task.id) }}" method="POST" class="toggle-task-form">
-                <button type="submit" class="modern-btn modern-btn-icon {{ 'modern-btn-outline' if task.status else 'modern-btn-primary' }}" title="{{ 'Reabrir' if task.status else 'Completar' }}">
-                    <i class="{{ 'bi bi-arrow-counterclockwise' if task.status else 'bi bi-check2' }}"></i>
-                </button>
-            </form>
-            <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST">
-                <button type="button" class="modern-btn modern-btn-icon modern-btn-danger" title="Excluir" onclick="showConfirmModal(this.closest('form'), 'Excluir Tarefa', 'Deseja excluir permanentemente?')">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </form>
-        </div>
+    <!-- ... (Dentro do loop for task in tasks) ... -->
+<div class="modern-card hover-lift p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center gap-3">
+        
+        <!-- 1. CORREÇÃO DO ÍCONE (Jinja do lado de fora do style) -->
+        <i class="{% if task.status %}bi bi-check-circle-fill{% else %}bi bi-circle{% endif %} fs-4 task-status-icon" 
+           {% if task.status %}style="color: var(--accent-primary);"{% else %}style="color: var(--border-subtle);"{% endif %}></i>
+        
+        <span class="fs-5 {% if task.status %}task-completed{% else %}task-pending{% endif %} task-title-text">{{ task.title }}</span>
     </div>
+    
+    <div class="d-flex gap-2 align-items-center">
+        <!-- Botão Completar -->
+        <form action="{{ url_for('tasks.toggle_task', task_id=task.id) }}" method="POST" class="toggle-task-form m-0 d-flex">
+            <button type="submit" class="modern-btn modern-btn-icon {% if task.status %}modern-btn-outline{% else %}modern-btn-primary{% endif %}" title="{{ 'Reabrir' if task.status else 'Completar' }}">
+                <i class="{% if task.status %}bi bi-arrow-counterclockwise{% else %}bi bi-check2{% endif %}"></i>
+            </button>
+        </form>
+
+        <!-- 2. CORREÇÃO DO ONCLICK (Passando a URL por data-action) -->
+        <button type="button" class="modern-btn modern-btn-icon modern-btn-outline d-flex" title="Anotações"
+                data-title="{{ task.title }}" 
+                data-desc="{{ task.description or '' }}"
+                data-action="{{ url_for('tasks.update_description', task_id=task.id) }}"
+                onclick="showDescriptionModal(this.getAttribute('data-action'), this)">
+            <i class="bi bi-text-paragraph"></i>
+        </button>
+        
+        <!-- Botão Excluir -->
+        <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST" class="m-0 d-flex">
+            <button type="button" class="modern-btn modern-btn-icon modern-btn-danger" title="Excluir" onclick="showConfirmModal(this.closest('form'), 'Excluir Tarefa', 'Deseja excluir permanentemente?')">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</div>
     {% endfor %}
 </div>
 {% endblock %}

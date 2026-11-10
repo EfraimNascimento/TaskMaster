@@ -28,6 +28,24 @@ def register():
             return redirect(url_for('auth.login'))
     return render_template('register.html')
 
+# @tasks_bp.route('/description/<int:task_id>', methods=['POST'])
+# @login_required
+# def update_description(task_id):
+#     tarefa = Task.query.get(task_id)
+#     if not tarefa: return redirect(request.referrer)
+    
+#     # Verifica permissão
+#     if tarefa.group_id:
+#         membro = db.session.query(user_group).filter_by(user_id=current_user.id, group_id=tarefa.group_id).first()
+#         if not membro: return redirect(request.referrer)
+#     else:
+#         if tarefa.user_id != current_user.id: return redirect(request.referrer)
+        
+#     # Salva a nova descrição
+#     tarefa.description = request.form.get('description')
+#     db.session.commit()
+#     return redirect(request.referrer or url_for('tasks.home'))
+
 @auth_bp.route('/logout')
 @login_required
 def logout():

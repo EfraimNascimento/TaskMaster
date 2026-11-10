@@ -12,14 +12,20 @@
         {% for convite in convites %}
         <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background-color: var(--bg-canvas); border: 1px solid var(--border-subtle);">
             <span class="fw-medium"><strong>{{ convite.sender.username }}</strong> quer adicionar você.</span>
-            <div class="d-flex gap-2">
-                <form action="{{ url_for('tasks.accept_friend_request', friendship_id=convite.id) }}" method="POST">
-                    <button type="submit" class="modern-btn modern-btn-primary px-3" title="Aceitar"><i class="bi bi-check-lg"></i></button>
-                </form>
-                <form action="{{ url_for('tasks.reject_friend_request', friendship_id=convite.id) }}" method="POST">
-                    <button type="submit" class="modern-btn modern-btn-danger px-3" title="Recusar"><i class="bi bi-x-lg"></i></button>
-                </form>
-            </div>
+            <div class="d-flex gap-2 align-items-center">
+            <form action="{{ url_for('tasks.accept_friend_request', friendship_id=convite.id) }}" method="POST" class="m-0 d-flex">
+                <!-- A classe modern-btn-icon força o botão a ser um quadrado de 42x42px -->
+                <button type="submit" class="modern-btn modern-btn-icon modern-btn-primary" title="Aceitar">
+                    <i class="bi bi-check-lg"></i>
+                </button>
+            </form>
+            
+            <form action="{{ url_for('tasks.reject_friend_request', friendship_id=convite.id) }}" method="POST" class="m-0 d-flex">
+                <button type="submit" class="modern-btn modern-btn-icon modern-btn-danger" title="Recusar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </form>
+        </div>
         </div>
         {% endfor %}
     </div>
