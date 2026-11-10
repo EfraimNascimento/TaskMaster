@@ -1,51 +1,36 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="mb-4">
-    <h2 class="fw-bold">Minhas Tarefas</h2>
-    <p class="text-muted-custom">Gerencie suas atividades pessoais de forma privada.</p>
+<div class="mb-4 animate-in">
+    <h2 class="fw-bold m-0">Minhas Tarefas</h2>
+    <p style="color: var(--text-muted);">Organize seu dia com foco e produtividade.</p>
 </div>
 
-<!-- Criar Nova Tarefa -->
-<div class="modern-card mb-5">
-    <form action="{{ url_for('tasks.add_task') }}" method="POST" class="d-flex gap-2">
-        <input type="text" name="title" class="form-control" placeholder="Adicionar nova tarefa..." required>
-        <button type="submit" class="btn btn-primary px-4" style="background-color: var(--accent-primary); border:none;">Adicionar</button>
+<div class="modern-card mb-5 animate-in delay-1">
+    <form action="{{ url_for('tasks.add_task') }}" method="POST" class="d-flex gap-3 flex-column flex-md-row">
+        <input type="text" name="title" class="modern-input flex-grow-1" placeholder="O que precisa ser feito hoje?" required autocomplete="off">
+        <button type="submit" class="modern-btn modern-btn-primary text-nowrap"><i class="bi bi-plus-lg"></i> Adicionar</button>
     </form>
 </div>
 
-<!-- Lista de Tarefas -->
-<div>
+<div class="d-flex flex-column gap-3 animate-in delay-2">
     {% for task in tasks %}
-    <div class="modern-card mb-3 py-3 d-flex justify-content-between align-items-center">
-        <div>
-            {% if task.status %}
-                <del class="text-muted-custom fs-5">{{ task.title }}</del>
-            {% else %}
-                <span class="fs-5 fw-medium">{{ task.title }}</span>
-            {% endif %}
+    <div class="modern-card hover-lift p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <i class="{{ 'bi bi-check-circle-fill' if task.status else 'bi bi-circle' }} fs-4 task-status-icon" style="color: {{ 'var(--accent-primary)' if task.status else 'var(--border-subtle)' }};"></i>
+            <span class="fs-5 {{ 'task-completed' if task.status else 'task-pending' }} task-title-text">{{ task.title }}</span>
         </div>
-        
         <div class="d-flex gap-2">
-            <!-- Botão de Status (Rota Inteligente) -->
-            <form action="{{ url_for('tasks.toggle_task_status_html', task_id=task.id) }}" method="POST">
-                <button type="submit" class="btn btn-sm {{ 'btn-outline-secondary' if task.status else 'btn-success' }}">
-                    <i class="bi bi-check2-circle"></i> {{ 'Reabrir' if task.status else 'Completar' }}
+            <form action="{{ url_for('tasks.toggle_task', task_id=task.id) }}" method="POST" class="toggle-task-form">
+                <button type="submit" class="modern-btn modern-btn-icon {{ 'modern-btn-outline' if task.status else 'modern-btn-primary' }}" title="{{ 'Reabrir' if task.status else 'Completar' }}">
+                    <i class="{{ 'bi bi-arrow-counterclockwise' if task.status else 'bi bi-check2' }}"></i>
                 </button>
             </form>
-            
-            <!-- Botão de Deletar -->
             <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST">
-                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Excluir esta tarefa permanentemente?')">
+                <button type="button" class="modern-btn modern-btn-icon modern-btn-danger" title="Excluir" onclick="showConfirmModal(this.closest('form'), 'Excluir Tarefa', 'Deseja excluir permanentemente?')">
                     <i class="bi bi-trash"></i>
                 </button>
             </form>
         </div>
-    </div>
-    {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-clipboard-check fs-1 text-muted-custom" style="opacity: 0.5;"></i>
-        <p class="text-muted-custom mt-3">Você não tem tarefas pendentes. Aproveite o dia!</p>
     </div>
     {% endfor %}
 </div>

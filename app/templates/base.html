@@ -3,141 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster</title>
+    <title>TaskMaster SaaS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    
-    <style>
-        /* 1. Design Tokens (Variáveis de Tema de Alto Contraste) */
-        :root {
-            --sidebar-width: 260px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-        }
-
-        /* Restauração dos 5 Temas (Adicione dentro do seu <style> no base.html) */
-        .theme-light { --bg-canvas: #f8fafc; --bg-surface: #ffffff; --border-subtle: #e2e8f0; --text-main: #0f172a; --text-muted: #64748b; --accent-primary: #4f46e5; --accent-hover: #4338ca; }
-        .theme-dark { --bg-canvas: #0f172a; --bg-surface: #1e293b; --border-subtle: #334155; --text-main: #f8fafc; --text-muted: #94a3b8; --accent-primary: #6366f1; --accent-hover: #818cf8; }
-        .theme-midnight { --bg-canvas: #171527; --bg-surface: #231f3a; --border-subtle: #3d3761; --text-main: #fdfcff; --text-muted: #a7a1c9; --accent-primary: #9f7aea; --accent-hover: #b794f4; }
-        .theme-ocean { --bg-canvas: #e0f2fe; --bg-surface: #ffffff; --border-subtle: #bae6fd; --text-main: #0c4a6e; --text-muted: #0284c7; --accent-primary: #0ea5e9; --accent-hover: #0284c7; }
-        .theme-sunset { --bg-canvas: #fff1f2; --bg-surface: #ffffff; --border-subtle: #fecdd3; --text-main: #881337; --text-muted: #e11d48; --accent-primary: #f43f5e; --accent-hover: #be123c; }
-
-        /* Para garantir que o botão sempre apareça, adicione isto: */
-        .btn-accent {
-            background-color: var(--accent-primary) !important;
-            color: #ffffff !important;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--radius-sm);
-        }
-
-        /* 2. Reset Base e Aplicação de Cores */
-        body {
-            background-color: var(--bg-canvas);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            transition: background-color 0.3s ease;
-        }
-
-        a { color: var(--accent-primary); text-decoration: none; }
-        a:hover { color: var(--accent-hover); }
-
-        /* 3. Componentes SaaS (Substitutos do Bootstrap padrão) */
-        .modern-card {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-soft);
-            color: var(--text-main);
-            padding: 1.5rem;
-        }
-
-        .modern-input {
-            background-color: var(--bg-canvas);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-main);
-            border-radius: var(--radius-sm);
-            padding: 0.6rem 1rem;
-        }
-        .modern-input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-
-        .btn-accent {
-            background-color: var(--accent-primary);
-            color: #ffffff;
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 0.6rem 1.2rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .btn-accent:hover { background-color: var(--accent-hover); color: #ffffff; }
-
-        /* 4. Estrutura do Layout */
-        .app-container { display: flex; height: 100vh; overflow: hidden; }
-        
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--bg-surface);
-            border-right: 1px solid var(--border-subtle);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            overflow-y: auto;
-        }
-        
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.5rem 0.75rem;
-            color: var(--text-muted);
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            transition: all 0.2s;
-        }
-        .sidebar-link:hover, .sidebar-link.active {
-            background-color: var(--bg-canvas);
-            color: var(--accent-primary);
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        
-        .topbar {
-            height: 72px;
-            background-color: var(--bg-canvas);
-            border-bottom: 1px solid var(--border-subtle);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        /* Correções Bootstrap para temas escuros */
-        .dropdown-menu { background-color: var(--bg-surface); border-color: var(--border-subtle); }
-        .dropdown-item { color: var(--text-main); }
-        .dropdown-item:hover { background-color: var(--bg-canvas); color: var(--accent-primary); }
-        .text-muted-custom { color: var(--text-muted) !important; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
-<!-- Puxa o tema do banco de dados (ajuste os nomes no settings.html) -->
 <body class="{{ current_user.theme if current_user.is_authenticated and current_user.theme else 'theme-light' }}">
     
+    <!-- Fundo Embaçado do Menu Mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    
+    <!-- SISTEMA DE NOTIFICAÇÕES... -->    
+    <div class="position-fixed top-0 end-0 p-4" style="z-index: 1050; margin-top: 72px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="modern-card flash-message shadow-lg mb-3 d-flex justify-content-between align-items-center animate-in" 
+                         style="border-left: 4px solid var(--{{ 'danger-color' if category == 'error' else 'accent-primary' }}); padding: 1rem; min-width: 300px; background-color: var(--bg-surface);">
+                        <span class="fw-bold">{{ message }}</span>
+                        <button type="button" class="modern-btn" onclick="this.closest('.flash-message').remove()" style="padding: 0.2rem 0.5rem; background: transparent; border: none; color: var(--text-muted);"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <div class="app-container">
         {% if current_user.is_authenticated %}
         <aside class="sidebar">
@@ -147,37 +37,36 @@
             </div>
             
             {% if sidebar_convites %}
-            <div class="alert alert-warning py-2 px-3 border-0 shadow-sm" style="border-radius: var(--radius-sm);">
+            <div class="alert alert-warning py-2 px-3 border-0 shadow-sm mb-3" style="border-radius: var(--radius-sm);">
                 <small class="fw-bold"><i class="bi bi-bell-fill"></i> {{ sidebar_convites|length }} Convite(s)</small>
                 <a href="{{ url_for('tasks.social_dashboard') }}" class="btn btn-sm btn-dark w-100 mt-2">Verificar</a>
             </div>
             {% endif %}
 
-            <small class="text-uppercase fw-bold text-muted-custom mt-2 mb-2 px-2" style="font-size: 0.75rem;">Workspace</small>
-            <a href="{{ url_for('tasks.home') }}" class="sidebar-link {% if request.endpoint == 'tasks.home' %}active{% endif %}">
-                <i class="bi bi-house-door"></i> Minhas Tarefas
-            </a>
-            <a href="{{ url_for('tasks.social_dashboard') }}" class="sidebar-link {% if request.endpoint == 'tasks.social_dashboard' %}active{% endif %}">
-                <i class="bi bi-people"></i> Gerenciar Social
-            </a>
+            <small class="text-uppercase fw-bold mt-2 mb-2 px-2" style="color: var(--text-muted); font-size: 0.75rem;">Workspace</small>
+            <a href="{{ url_for('tasks.home') }}" class="sidebar-link {% if request.endpoint == 'tasks.home' %}active{% endif %}"><i class="bi bi-house-door"></i> Minhas Tarefas</a>
+            <a href="{{ url_for('tasks.social_dashboard') }}" class="sidebar-link {% if request.endpoint == 'tasks.social_dashboard' %}active{% endif %}"><i class="bi bi-people"></i> Hub Social</a>
 
-            <small class="text-uppercase fw-bold text-muted-custom mt-4 mb-2 px-2" style="font-size: 0.75rem;">Meus Grupos</small>
+            <small class="text-uppercase fw-bold mt-4 mb-2 px-2" style="color: var(--text-muted); font-size: 0.75rem;">Meus Grupos</small>
             {% for grupo in sidebar_grupos %}
-            <a href="{{ url_for('tasks.group_board', group_id=grupo.id) }}" class="sidebar-link {% if request.view_args and request.view_args.get('group_id') == grupo.id %}active{% endif %}">
-                <i class="bi bi-hash"></i> {{ grupo.name }}
-            </a>
+            <a href="{{ url_for('tasks.group_board', group_id=grupo.id) }}" class="sidebar-link {% if request.view_args and request.view_args.get('group_id') == grupo.id %}active{% endif %}"><i class="bi bi-hash"></i> {{ grupo.name }}</a>
             {% else %}
-            <span class="px-2 text-muted-custom" style="font-size: 0.85rem;">Nenhum grupo ativo.</span>
+            <span class="px-2" style="color: var(--text-muted); font-size: 0.85rem;">Nenhum grupo.</span>
             {% endfor %}
         </aside>
         {% endif %}
 
         <main class="main-content">
-            <header class="topbar">
-                <div>
-                    <!-- Espaço para breadcrumbs ou título da página no futuro -->
-                </div>
-                
+        <header class="topbar">
+                    <!-- Botão Hamburguer (Só aparece no mobile) -->
+                    <button class="hamburger-btn" id="hamburgerBtn">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <!-- Nome do App no centro do mobile (opcional) -->
+                    <h5 class="fw-bold m-0 d-md-none" style="color: var(--accent-primary);">TaskMaster</h5>
+                    
+                    <div class="dropdown">                
+                <div></div>
                 <div class="dropdown">
                     {% if current_user.is_authenticated %}
                         <a href="#" class="d-flex align-items-center gap-2 text-decoration-none" style="color: var(--text-main); font-weight: 500;" data-bs-toggle="dropdown">
@@ -185,39 +74,120 @@
                                 {{ current_user.username[0]|upper }}
                             </div>
                             {{ current_user.username }}
-                            <i class="bi bi-chevron-down" style="font-size: 0.75rem;"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="border-radius: var(--radius-sm);">
-                            <li><a class="dropdown-item py-2" href="{{ url_for('tasks.user_settings') }}"><i class="bi bi-gear me-2"></i> Configurações</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" style="background-color: var(--bg-surface); border-color: var(--border-subtle);">
+                            <li><a class="dropdown-item" href="{{ url_for('tasks.user_settings') }}" style="color: var(--text-main);"><i class="bi bi-gear me-2"></i> Configurações</a></li>
                             <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
-                            <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
                         </ul>
                     {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="btn-accent text-decoration-none">Entrar</a>
+                        <a href="{{ url_for('auth.login') }}" class="modern-btn modern-btn-primary text-decoration-none">Entrar</a>
                     {% endif %}
                 </div>
             </header>
 
-            <!-- Conteúdo Injetado -->
             <div class="p-4 p-md-5">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="modern-card mb-4 border-start border-4 border-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'primary' }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold">{{ message }}</span>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: var(--text-main) == '#f8fafc' ? 'invert(1)' : 'none';"></button>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
                 {% block content %}{% endblock %}
             </div>
         </main>
     </div>
 
+    <!-- MODAL DE CONFIRMAÇÃO -->
+    <div class="modal fade" id="customConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--danger-color);"></i>
+                    <h5 class="fw-bold mt-3 mb-2" id="confirmModalTitle" style="color: var(--text-main);">Tem certeza?</h5>
+                    <p class="mb-4" id="confirmModalText" style="color: var(--text-muted); font-size: 0.9rem;">Ação irreversível.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="modern-btn modern-btn-outline w-50" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="modern-btn modern-btn-danger w-50" id="confirmModalBtn">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Flashes Timeout
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.flash-message').forEach(function(msg) {
+                    msg.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    msg.style.opacity = '0';
+                    msg.style.transform = 'translateY(-10px) scale(0.95)';
+                    setTimeout(() => msg.remove(), 500);
+                });
+            }, 4000);
+        });
+
+        // Modal Logic
+        let formToSubmit = null;
+        function showConfirmModal(formElement, title, text) {
+            formToSubmit = formElement;
+            document.getElementById('confirmModalTitle').innerText = title;
+            document.getElementById('confirmModalText').innerText = text;
+            new bootstrap.Modal(document.getElementById('customConfirmModal')).show();
+        }
+        document.getElementById('confirmModalBtn').addEventListener('click', function() {
+            if(formToSubmit) formToSubmit.submit();
+        });
+
+        // Optimistic UI
+        document.querySelectorAll('.toggle-task-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = this.querySelector('button');
+                const btnIcon = btn.querySelector('i');
+                const taskCard = this.closest('.modern-card');
+                taskCard.style.transform = 'scale(0.98)';
+                setTimeout(() => taskCard.style.transform = '', 150);
+                
+                const statusIcon = taskCard.querySelector('.task-status-icon');
+                const textElement = taskCard.querySelector('.task-title-text');
+                
+                if (btn.classList.contains('modern-btn-outline')) {
+                    btn.classList.replace('modern-btn-outline', 'modern-btn-primary');
+                    btn.title = "Completar";
+                    btnIcon.className = 'bi bi-check2';
+                    statusIcon.className = 'bi bi-circle fs-4 task-status-icon';
+                    statusIcon.style.color = 'var(--border-subtle)';
+                    textElement.classList.replace('task-completed', 'task-pending');
+                } else {
+                    btn.classList.replace('modern-btn-primary', 'modern-btn-outline');
+                    btn.title = "Reabrir";
+                    btnIcon.className = 'bi bi-arrow-counterclockwise';
+                    statusIcon.className = 'bi bi-check-circle-fill fs-4 task-status-icon';
+                    statusIcon.style.color = 'var(--accent-primary)';
+                    textElement.classList.replace('task-pending', 'task-completed');
+                }
+                fetch(this.action, { method: 'POST' });
+            });
+        });
+        // Lógica do Hamburger Menu Mobile
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (hamburgerBtn && sidebar && backdrop) {
+            function toggleMenu() {
+                sidebar.classList.toggle('open');
+                backdrop.classList.toggle('show');
+            }
+
+            // Abre o menu ao clicar no hamburger
+            hamburgerBtn.addEventListener('click', toggleMenu);
+            
+            // Fecha o menu ao clicar no fundo escuro
+            backdrop.addEventListener('click', toggleMenu);
+            
+            // Fecha o menu ao clicar em qualquer link da sidebar (útil no mobile)
+            sidebar.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+        }
+    </script>
 </body>
 </html>

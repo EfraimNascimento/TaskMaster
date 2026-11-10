@@ -1,110 +1,124 @@
 {% extends "base.html" %}
-
 {% block content %}
-<!-- Cabeçalho do Grupo e Ações Destrutivas -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+
+<!-- CABEÇALHO DO GRUPO -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3 animate-in">
     <div>
-        <h2 class="fw-bold mb-0"><i class="bi bi-hash text-muted-custom"></i> {{ grupo.name }}</h2>
-        <span class="badge mt-2" style="background-color: var(--border-subtle); color: var(--text-main);">Papel: {{ meu_papel|title }}</span>
+        <h2 class="fw-bold m-0"><i class="bi bi-hash"></i> {{ grupo.name }}</h2>
+        <span class="modern-badge mt-2 d-inline-block" style="background-color: var(--border-subtle); color: var(--text-main);">Papel: {{ meu_papel }}</span>
     </div>
     
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap align-items-center">
         {% if meu_papel == 'admin' %}
-            <form action="{{ url_for('tasks.delete_group_html', group_id=grupo.id) }}" method="POST">
-                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('ATENÇÃO: Deletar o grupo inteiro e todas as suas tarefas?')">
-                    <i class="bi bi-trash"></i> Deletar Grupo
+            <!-- Botão Convidar: Largura e Altura travadas -->
+            <button type="button" class="modern-btn modern-btn-primary" style="width: 145px; height: 46px;" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                <i class="bi bi-person-plus"></i> Convidar
+            </button>
+            
+            <!-- Botão Encerrar: form com d-flex para remover espaços invisíveis -->
+            <form action="{{ url_for('tasks.delete_group', group_id=grupo.id) }}" method="POST" class="m-0 d-flex">
+                <button type="button" class="modern-btn modern-btn-danger" style="width: 145px; height: 46px;" onclick="showConfirmModal(this.closest('form'), 'Encerrar Grupo', 'Deletar o grupo e todas as tarefas?')">
+                    <i class="bi bi-trash"></i> Encerrar
                 </button>
             </form>
         {% else %}
-            <form action="{{ url_for('tasks.leave_group_html', group_id=grupo.id) }}" method="POST">
-                <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('Tem certeza que deseja sair deste grupo?')">
-                    <i class="bi bi-box-arrow-right"></i> Sair do Grupo
+            <!-- Botão Sair: form com d-flex e dimensões travadas -->
+            <form action="{{ url_for('tasks.leave_group', group_id=grupo.id) }}" method="POST" class="m-0 d-flex">
+                <button type="button" class="modern-btn modern-btn-outline" style="width: 145px; height: 46px;" onclick="showConfirmModal(this.closest('form'), 'Sair', 'Sair do grupo?')">
+                    <i class="bi bi-box-arrow-right"></i> Sair
                 </button>
             </form>
         {% endif %}
     </div>
 </div>
 
-<!-- Painel de Gestão da Equipe -->
-<div class="modern-card mb-5">
-    <h5 class="fw-bold mb-3"><i class="bi bi-people"></i> Membros da Equipe</h5>
-    
-    <div class="d-flex flex-wrap gap-2 mb-4">
+<!-- PAINEL DA EQUIPE (Agora mais limpo) -->
+<div class="modern-card mb-4 animate-in delay-1">
+    <h5 class="fw-bold mb-3"><i class="bi bi-people"></i> Membros do Workspace</h5>
+    <div class="d-flex flex-wrap gap-2">
         {% for membro in membros_grupo %}
-            <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-pill" style="background-color: var(--bg-canvas); border: 1px solid var(--border-subtle);">
-                <i class="bi bi-person-circle text-muted-custom"></i>
-                <span class="fw-medium" style="font-size: 0.9rem;">{{ membro.username }}</span>
-            </div>
+            <span class="modern-badge" style="background-color: var(--bg-canvas); border: 1px solid var(--border-subtle); color: var(--text-main); font-size: 0.8rem; padding: 0.5rem 1rem;">
+                <i class="bi bi-person-circle"></i> {{ membro.username }}
+            </span>
         {% endfor %}
     </div>
-
-    {% if meu_papel == 'admin' %}
-        <hr style="border-color: var(--border-subtle);">
-        <form action="{{ url_for('tasks.add_group_member_html', group_id=grupo.id) }}" method="POST" class="d-flex gap-2 mt-3">
-            <select name="friend_id" class="form-select modern-input flex-grow-1" required>
-                <option value="" disabled selected>Selecione um amigo para convidar...</option>
-                {% for amigo in amigos_elegiveis %}
-                    <option value="{{ amigo.id }}">{{ amigo.username }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn-accent text-nowrap"><i class="bi bi-person-plus"></i> Adicionar</button>
-        </form>
-        {% if not amigos_elegiveis %}
-            <small class="text-muted-custom d-block mt-2">Todos os seus amigos já participam deste grupo.</small>
-        {% endif %}
-    {% endif %}
 </div>
 
-<!-- Criar Tarefa do Grupo -->
-<div class="modern-card mb-4">
-    <form action="{{ url_for('tasks.create_group_task_html', group_id=grupo.id) }}" method="POST" class="d-flex gap-3">
-        <input type="text" name="title" class="modern-input flex-grow-1" placeholder="Nova tarefa para a equipe..." required>
-        <button type="submit" class="btn-accent"><i class="bi bi-plus-lg"></i> Adicionar Tarefa</button>
+<!-- CRIAR TAREFAS -->
+<div class="modern-card mb-4 animate-in delay-1">
+    <form action="{{ url_for('tasks.create_group_task', group_id=grupo.id) }}" method="POST" class="d-flex gap-3 flex-column flex-md-row">
+        <input type="text" name="title" class="modern-input flex-grow-1" placeholder="Nova tarefa para a equipe..." required autocomplete="off">
+        <button type="submit" class="modern-btn modern-btn-primary text-nowrap"><i class="bi bi-plus-lg"></i> Adicionar</button>
     </form>
 </div>
 
-<!-- Lista de Tarefas do Grupo -->
-<h5 class="fw-bold mb-3 mt-4">Tarefas do Quadro</h5>
-<div>
+<!-- LISTA DE TAREFAS -->
+<div class="d-flex flex-column gap-3 animate-in delay-2">
     {% for tarefa in tarefas %}
-    <div class="d-flex gap-2">
-        <!-- Completar -->
-        <form action="{{ url_for('tasks.toggle_task_status_html', task_id=tarefa.id) }}" method="POST">
-            <button type="submit" class="btn btn-sm {{ 'btn-outline-secondary' if tarefa.status else 'btn-success' }}">
-                <i class="bi bi-check2-circle"></i>
-            </button>
-        </form>
-        
-        <!-- Deletar (Rota Inteligente) -->
-        <form action="{{ url_for('tasks.delete_task', task_id=tarefa.id) }}" method="POST">
-            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Excluir esta tarefa compartilhada?')">
-                <i class="bi bi-trash"></i>
-            </button>
-        </form>
-    </div>
-    <!-- <div class="modern-card mb-3 py-3 d-flex justify-content-between align-items-center">
-        <div>
-            {% if tarefa.status %}
-                <del class="text-muted-custom fs-5">{{ tarefa.title }}</del>
-            {% else %}
-                <span class="fs-5 fw-medium">{{ tarefa.title }}</span>
-            {% endif %}
-            <br>
-            <small class="text-muted-custom"><i class="bi bi-person-badge"></i> Criada por: {{ tarefa.owner.username if tarefa.owner else 'Sistema' }}</small>
+    <div class="modern-card hover-lift p-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <i class="{{ 'bi bi-check-circle-fill' if tarefa.status else 'bi bi-circle' }} fs-4 task-status-icon" style="color: {{ 'var(--accent-primary)' if tarefa.status else 'var(--border-subtle)' }};"></i>
+            <div>
+                <span class="fs-5 d-block {{ 'task-completed' if tarefa.status else 'task-pending' }} task-title-text">{{ tarefa.title }}</span>
+                <small style="color: var(--text-muted);">Por: {{ tarefa.owner.username }}</small>
+            </div>
         </div>
-        
         <div class="d-flex gap-2">
-            <form action="{{ url_for('tasks.toggle_task_status_html', task_id=tarefa.id) }}" method="POST">
-                <button type="submit" class="btn btn-sm {{ 'btn-outline-secondary' if tarefa.status else 'btn-success' }}">
-                    <i class="bi bi-check2-circle"></i> {{ 'Reabrir' if tarefa.status else 'Completar' }}
+            <form action="{{ url_for('tasks.toggle_task', task_id=tarefa.id) }}" method="POST" class="toggle-task-form m-0">
+                <button type="submit" class="modern-btn modern-btn-icon {{ 'modern-btn-outline' if tarefa.status else 'modern-btn-primary' }}" title="{{ 'Reabrir' if tarefa.status else 'Completar' }}">
+                    <i class="{{ 'bi bi-arrow-counterclockwise' if tarefa.status else 'bi bi-check2' }}"></i>
+                </button>
+            </form>
+            <form action="{{ url_for('tasks.delete_task', task_id=tarefa.id) }}" method="POST" class="m-0">
+                <button type="button" class="modern-btn modern-btn-icon modern-btn-danger" title="Excluir" onclick="showConfirmModal(this.closest('form'), 'Excluir Tarefa', 'Excluir tarefa do grupo?')">
+                    <i class="bi bi-trash"></i>
                 </button>
             </form>
         </div>
-    </div> -->
+    </div>
     {% else %}
-    <div class="text-center py-4">
-        <p class="text-muted-custom mb-0">O quadro está vazio. Crie a primeira tarefa acima!</p>
+    <div class="modern-card text-center py-5" style="border: 2px dashed var(--border-subtle); background: transparent;">
+        <i class="bi bi-cup-hot fs-1 mb-3 d-block" style="color: var(--border-subtle);"></i>
+        <h5 class="fw-bold">Nenhuma tarefa no grupo!</h5>
+        <p class="mb-0" style="color: var(--text-muted);">Que tal criar a primeira atividade para sua equipe?</p>
     </div>
     {% endfor %}
 </div>
+
+<!-- MODAL: ADICIONAR MEMBRO (Oculto até clicar) -->
+{% if meu_papel == 'admin' %}
+<div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-plus" style="font-size: 2.5rem; color: var(--accent-primary);"></i>
+                    <h4 class="fw-bold mt-2" style="color: var(--text-main);">Convidar Membro</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Selecione um contato para colaborar neste workspace.</p>
+                </div>
+                
+                <form action="{{ url_for('tasks.add_group_member', group_id=grupo.id) }}" method="POST">
+                    <div class="mb-4">
+                        <select name="friend_id" class="modern-input" required style="cursor: pointer;">
+                            <option value="" disabled selected>Escolha um amigo da sua rede...</option>
+                            {% for amigo in amigos_elegiveis %}
+                                <option value="{{ amigo.id }}">{{ amigo.username }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if not amigos_elegiveis %}
+                            <small class="text-danger d-block mt-2 text-center">Todos os seus contatos já estão neste grupo ou você não possui conexões.</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="modern-btn modern-btn-outline w-50" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="modern-btn modern-btn-primary w-50" {% if not amigos_elegiveis %}disabled{% endif %}>Adicionar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

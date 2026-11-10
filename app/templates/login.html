@@ -1,15 +1,33 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+
 {% block content %}
-<div class="auth-container">
-    <h2 class="auth-title">Acessar Conta</h2>
-    <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
-        <input type="text" name="username" class="input-field" placeholder="Nome de usuário" required>
-        <input type="password" name="password" class="input-field" placeholder="Senha" required>
-        <button type="submit" class="btn btn-primary">Entrar</button>
-    </form>
-    <div class="auth-links">
-        Não possui uma conta? <a href="{{ url_for('auth.register') }}">Registre-se</a>
+<div class="d-flex justify-content-center align-items-center animate-in" style="min-height: 75vh;">
+    <div class="modern-card" style="width: 100%; max-width: 400px;">
+        
+        <div class="text-center mb-4">
+            <i class="bi bi-check-all fs-1" style="color: var(--accent-primary);"></i>
+            <h3 class="fw-bold mt-2">Bem-vindo de volta</h3>
+            <p style="color: var(--text-muted);">Faça login para acessar o seu workspace.</p>
+        </div>
+
+        <form action="{{ url_for('auth.login') }}" method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-bold" style="color: var(--text-muted); font-size: 0.85rem;">Nome de Usuário</label>
+                <input type="text" name="username" class="modern-input" placeholder="Seu usuário" required autofocus>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold" style="color: var(--text-muted); font-size: 0.85rem;">Senha</label>
+                <input type="password" name="password" class="modern-input" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="modern-btn modern-btn-primary w-100 mb-3">Entrar no Sistema</button>
+            
+            <div class="text-center">
+                <small style="color: var(--text-muted);">Ainda não tem uma conta? <a href="{{ url_for('auth.register') }}" class="fw-bold">Criar conta</a></small>
+            </div>
+        </form>
+        
     </div>
 </div>
 {% endblock %}
